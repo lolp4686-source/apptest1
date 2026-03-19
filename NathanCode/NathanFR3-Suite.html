@@ -1,0 +1,1509 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>NathanFR3 Suite</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0b0d12;--bg2:#111520;--bg3:#161c2d;--bg4:#1e2640;--bg5:#263050;
+  --acc:#6366f1;--acc2:#06b6d4;--acc3:#10b981;--acc4:#f59e0b;--acc5:#ef4444;--acc6:#ec4899;
+  --t:#f1f5f9;--t2:#94a3b8;--t3:#475569;
+  --bd:rgba(255,255,255,0.06);--bd2:rgba(255,255,255,0.11);
+  --font:'Segoe UI',system-ui,sans-serif;--mono:'Consolas','Courier New',monospace;
+  --sb:220px;--hh:52px;
+}
+html,body{height:100%;overflow:hidden;font-family:var(--font);background:var(--bg);color:var(--t)}
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-thumb{background:var(--bg5);border-radius:2px}
+
+/* ══ LAYOUT ══ */
+#app{display:flex;flex-direction:column;height:100vh}
+
+/* ══ HEADER ══ */
+#hdr{height:var(--hh);background:var(--bg2);border-bottom:1px solid var(--bd);display:flex;align-items:center;padding:0 16px;gap:10px;flex-shrink:0;z-index:100}
+.logo{display:flex;align-items:center;gap:10px}
+.logo-icon{width:34px;height:34px;background:linear-gradient(135deg,var(--acc),var(--acc2));border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:900;color:#fff;letter-spacing:-1px;flex-shrink:0}
+.logo-name{font-size:15px;font-weight:800;color:var(--t);letter-spacing:-.3px}
+.logo-name span{color:var(--acc)}
+.logo-ver{font-size:9px;font-family:var(--mono);color:var(--t3);margin-left:2px}
+.hdr-pills{display:flex;gap:5px;margin-left:10px}
+.hpill{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-family:var(--mono);padding:3px 8px;border-radius:99px}
+.hp-g{background:rgba(16,185,129,.1);color:var(--acc3);border:1px solid rgba(16,185,129,.2)}
+.hp-b{background:rgba(99,102,241,.1);color:#818cf8;border:1px solid rgba(99,102,241,.2)}
+.hp-y{background:rgba(245,158,11,.1);color:var(--acc4);border:1px solid rgba(245,158,11,.2)}
+.hp-r{background:rgba(239,68,68,.1);color:var(--acc5);border:1px solid rgba(239,68,68,.2)}
+.dot{width:5px;height:5px;border-radius:50%;background:currentColor}
+.hdr-r{margin-left:auto;display:flex;align-items:center;gap:8px}
+.notif-wrap{position:relative}
+.hdr-btn{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:15px;color:var(--t3);background:var(--bg3);border:1px solid var(--bd);transition:all .14s}
+.hdr-btn:hover{color:var(--t);background:var(--bg4)}
+.nbadge{position:absolute;top:-4px;right:-4px;width:16px;height:16px;background:var(--acc5);border-radius:50%;font-size:9px;font-weight:700;color:#fff;display:flex;align-items:center;justify-content:center;border:2px solid var(--bg2)}
+.notif-panel{position:absolute;top:calc(100% + 8px);right:0;width:300px;background:var(--bg2);border:1px solid var(--bd2);border-radius:12px;z-index:200;overflow:hidden;display:none}
+.notif-panel.open{display:block}
+.np-hdr{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px solid var(--bd);font-size:12px;font-weight:600}
+.nitem{display:flex;align-items:flex-start;gap:9px;padding:9px 13px;border-bottom:1px solid var(--bd);cursor:pointer;transition:background .12s}
+.nitem:last-child{border-bottom:none}
+.nitem:hover{background:var(--bg3)}
+.nitem.nerr{border-left:2px solid var(--acc5)}.nitem.nwarn{border-left:2px solid var(--acc4)}.nitem.nok{border-left:2px solid var(--acc3)}.nitem.ninfo{border-left:2px solid var(--acc)}
+.nicon{font-size:14px;flex-shrink:0;margin-top:1px}
+.ntxt{font-size:11px;color:var(--t);line-height:1.4}
+.ntime{font-size:9px;color:var(--t3);font-family:var(--mono);margin-top:2px}
+.uav{width:30px;height:30px;border-radius:50%;background:var(--acc);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff;flex-shrink:0}
+
+/* ══ BODY ══ */
+#body{flex:1;display:flex;overflow:hidden;min-height:0}
+
+/* ══ SIDEBAR ══ */
+#sb{width:var(--sb);background:var(--bg2);border-right:1px solid var(--bd);display:flex;flex-direction:column;overflow:hidden;flex-shrink:0;transition:width .22s}
+#sb.closed{width:52px}
+.sb-sec{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--t3);padding:12px 14px 4px;font-family:var(--mono);white-space:nowrap;overflow:hidden}
+#sb.closed .sb-sec{opacity:0}
+.nav{display:flex;align-items:center;gap:9px;padding:8px 12px;margin:1px 8px;border-radius:9px;cursor:pointer;font-size:13px;font-weight:500;color:var(--t2);transition:all .14s;border:1px solid transparent;white-space:nowrap;overflow:hidden;text-decoration:none}
+.nav:hover{background:var(--bg3);color:var(--t)}
+.nav.on{background:rgba(99,102,241,.14);color:#a5b4fc;border-color:rgba(99,102,241,.2)}
+.nav-ic{font-size:16px;width:20px;text-align:center;flex-shrink:0}
+.nav-lbl{flex:1;min-width:0}
+#sb.closed .nav-lbl{display:none}
+.nav-bd{margin-left:auto;font-size:9px;font-family:var(--mono);font-weight:700;padding:2px 6px;border-radius:99px;flex-shrink:0}
+#sb.closed .nav-bd{display:none}
+.nbd-r{background:rgba(239,68,68,.12);color:var(--acc5);border:1px solid rgba(239,68,68,.22)}
+.nbd-b{background:rgba(6,182,212,.1);color:var(--acc2);border:1px solid rgba(6,182,212,.2)}
+.nbd-g{background:rgba(16,185,129,.1);color:var(--acc3);border:1px solid rgba(16,185,129,.2)}
+.sb-foot{margin-top:auto;padding:10px;border-top:1px solid var(--bd)}
+.sb-user{display:flex;align-items:center;gap:8px;padding:8px;background:var(--bg3);border-radius:9px;overflow:hidden}
+#sb.closed .sb-user span{display:none}
+.sb-uname{font-size:12px;font-weight:600;color:var(--t)}
+.sb-ustatus{font-size:10px;color:var(--acc3);font-family:var(--mono);display:flex;align-items:center;gap:4px}
+
+/* ══ MAIN ══ */
+#main{flex:1;overflow:hidden;display:flex;flex-direction:column}
+.page{display:none;flex:1;overflow:hidden;flex-direction:column}
+.page.on{display:flex}
+.pg-scroll{flex:1;overflow-y:auto;padding:18px 20px 24px;display:flex;flex-direction:column;gap:14px}
+
+/* ══ CARDS ══ */
+.card{background:var(--bg2);border:1px solid var(--bd);border-radius:12px;padding:15px 17px}
+.card-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.card-ttl{font-size:13px;font-weight:600;color:var(--t)}
+.card-sub{font-size:10px;color:var(--t3);margin-top:2px;font-family:var(--mono)}
+.g4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.g3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.scard{background:var(--bg3);border:1px solid var(--bd);border-radius:10px;padding:13px}
+.slbl{font-size:9px;font-family:var(--mono);text-transform:uppercase;letter-spacing:1px;color:var(--t3)}
+.sval{font-size:22px;font-weight:800;color:var(--t);margin-top:5px;letter-spacing:-1px}
+.sdel{font-size:10px;margin-top:3px;font-family:var(--mono)}
+.up{color:var(--acc3)}.dn{color:var(--acc5)}.neu{color:var(--t3)}
+.btn{display:inline-flex;align-items:center;gap:5px;padding:6px 12px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;transition:all .14s;border:none;font-family:var(--font)}
+.btn-p{background:var(--acc);color:#fff}.btn-p:hover{background:#4f46e5}
+.btn-g{background:transparent;color:var(--t2);border:1px solid var(--bd2)}.btn-g:hover{background:var(--bg3);color:var(--t)}
+.btn-d{background:rgba(239,68,68,.1);color:var(--acc5);border:1px solid rgba(239,68,68,.2)}.btn-d:hover{background:rgba(239,68,68,.2)}
+.btn-sm{padding:4px 9px;font-size:11px;border-radius:6px}
+.bdg{display:inline-flex;align-items:center;font-size:10px;font-weight:700;padding:2px 8px;border-radius:99px;font-family:var(--mono)}
+.bdg-g{background:rgba(16,185,129,.1);color:var(--acc3);border:1px solid rgba(16,185,129,.2)}
+.bdg-r{background:rgba(239,68,68,.1);color:var(--acc5);border:1px solid rgba(239,68,68,.2)}
+.bdg-y{background:rgba(245,158,11,.1);color:var(--acc4);border:1px solid rgba(245,158,11,.2)}
+.bdg-b{background:rgba(99,102,241,.1);color:#a5b4fc;border:1px solid rgba(99,102,241,.2)}
+.bdg-c{background:rgba(6,182,212,.1);color:var(--acc2);border:1px solid rgba(6,182,212,.2)}
+.prog{height:4px;background:var(--bg4);border-radius:99px;overflow:hidden}
+.prog-f{height:100%;border-radius:99px;transition:width .5s}
+.tog{width:34px;height:20px;background:var(--bg5);border-radius:10px;cursor:pointer;transition:background .18s;flex-shrink:0;position:relative}
+.tog.on{background:var(--acc)}
+.tog::after{content:'';position:absolute;top:3px;left:3px;width:14px;height:14px;background:#fff;border-radius:50%;transition:transform .18s}
+.tog.on::after{transform:translateX(14px)}
+.rsb{display:flex;align-items:center;justify-content:space-between}
+.row{display:flex;align-items:center;gap:8px}
+.divider{border:none;border-top:1px solid var(--bd);margin:10px 0}
+.inp{background:var(--bg3);border:1px solid var(--bd2);border-radius:8px;color:var(--t);font-size:12px;padding:7px 10px;outline:none;font-family:var(--font);transition:border-color .14s}
+.inp:focus{border-color:var(--acc)}
+.inp::placeholder{color:var(--t3)}
+.logr{font-size:11px;font-family:var(--mono);padding:4px 0;border-bottom:1px solid var(--bd);color:var(--t2);display:flex;gap:8px;align-items:flex-start}
+.logr:last-child{border-bottom:none}
+.logt{color:var(--t3);width:52px;flex-shrink:0}
+.spark{width:100%;height:36px}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th{text-align:left;padding:7px 10px;font-size:9px;font-family:var(--mono);text-transform:uppercase;letter-spacing:1px;color:var(--t3);border-bottom:1px solid var(--bd)}
+td{padding:9px 10px;border-bottom:1px solid var(--bd);color:var(--t2)}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:var(--bg3);color:var(--t)}
+
+/* ══ TERMINAL ══ */
+#term-shell{flex:1;display:flex;flex-direction:column;margin:14px 16px 16px;border-radius:12px;border:1px solid var(--bd2);overflow:hidden;background:#08090c}
+#th{height:36px;background:#0f1119;border-bottom:1px solid var(--bd);display:flex;align-items:center;padding:0 13px;gap:7px;flex-shrink:0}
+.tdot{width:11px;height:11px;border-radius:50%}
+#ttabs{display:flex;gap:3px;margin-left:10px}
+.ttab{font-size:10px;padding:3px 10px;border-radius:4px;cursor:pointer;color:var(--t3);font-family:var(--mono);transition:all .14s;border:1px solid transparent}
+.ttab.on{background:var(--bg3);color:var(--t);border-color:var(--bd)}
+#tout{flex:1;overflow-y:auto;padding:10px 14px;font-family:var(--mono);font-size:12px;line-height:1.8;background:#08090c}
+#tout::-webkit-scrollbar{width:4px}
+#tout::-webkit-scrollbar-thumb{background:#1e2030}
+.tl{word-break:break-all}
+.tps{color:var(--acc);font-weight:700;margin-right:7px}
+.tok{color:var(--acc3)}.terr{color:var(--acc5)}.twrn{color:var(--acc4)}.tinf{color:var(--acc2)}.tdim{color:var(--t3)}.thl{color:var(--acc6)}
+#tsug{padding:4px 14px;background:#0d0e16;border-top:1px solid var(--bd);display:none;flex-wrap:wrap;gap:4px;flex-shrink:0}
+.tsug-item{font-size:10px;font-family:var(--mono);color:var(--t3);padding:2px 7px;background:var(--bg3);border-radius:4px;cursor:pointer;border:1px solid var(--bd)}
+.tsug-item:hover{color:var(--t);border-color:var(--bd2)}
+.tsug-item b{color:var(--acc)}
+#trow{display:flex;align-items:center;padding:7px 14px;border-top:1px solid var(--bd);background:#0d0e16;flex-shrink:0}
+#tps{color:var(--acc);font-family:var(--mono);font-size:12px;margin-right:8px;font-weight:700;white-space:nowrap}
+#tinp{flex:1;background:transparent;border:none;outline:none;color:var(--t);font-size:12px;font-family:var(--mono);caret-color:var(--acc)}
+
+/* ══ EDITOR ══ */
+#editor-shell{flex:1;display:flex;flex-direction:column;overflow:hidden}
+#etabs{height:34px;background:#0f1322;display:flex;align-items:flex-end;border-bottom:1px solid var(--bd);overflow-x:auto;flex-shrink:0}
+#etabs::-webkit-scrollbar{height:0}
+.etab{display:flex;align-items:center;gap:6px;padding:0 12px;height:33px;font-size:11px;color:var(--t3);background:#0f1322;cursor:pointer;border-right:1px solid var(--bd);white-space:nowrap;position:relative;flex-shrink:0}
+.etab.on{background:var(--bg);color:var(--t)}
+.etab.on::after{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:var(--acc)}
+.etab-x{opacity:0;padding:0 2px;border-radius:3px;cursor:pointer;margin-left:2px;font-size:13px}
+.etab:hover .etab-x,.etab.on .etab-x{opacity:.6}
+.etab-x:hover{opacity:1!important;background:var(--bg4)}
+#ecw{flex:1;display:flex;overflow:hidden}
+#eln{width:44px;padding:10px 0;text-align:right;color:var(--t3);font-size:12px;line-height:20px;background:var(--bg);border-right:1px solid var(--bd);overflow:hidden;flex-shrink:0;font-family:var(--mono)}
+.eln-n{padding:0 8px 0 4px;height:20px;display:flex;align-items:center;justify-content:flex-end}
+#ecode{flex:1;padding:10px 0 10px 14px;overflow:auto;outline:none;line-height:20px;background:var(--bg);white-space:pre;cursor:text;caret-color:white;font-size:13px;font-family:var(--mono)}
+#ecode::-webkit-scrollbar{width:6px;height:6px}
+#ecode::-webkit-scrollbar-thumb{background:#232838;border-radius:3px}
+#esb{height:22px;background:#090b12;display:flex;align-items:center;padding:0 10px;flex-shrink:0;border-top:1px solid var(--bd)}
+.esbi{font-size:10px;color:var(--t3);padding:0 6px;font-family:var(--mono)}
+.esbi-r{margin-left:auto;display:flex}
+#ekb{height:34px;background:var(--bg3);border-top:1px solid var(--bd);display:flex;align-items:center;padding:0 8px;gap:3px;overflow-x:auto;flex-shrink:0}
+#ekb::-webkit-scrollbar{height:0}
+.ekk{padding:3px 8px;background:var(--bg4);border:1px solid var(--bd2);border-radius:5px;font-size:11px;color:var(--t2);cursor:pointer;font-family:var(--mono);white-space:nowrap;transition:all .12s}
+.ekk:hover{background:var(--bg5);color:var(--t)}
+
+/* ══ IA PANEL ══ */
+.ai-msg-wrap{display:flex;flex-direction:column;gap:3px;max-width:92%}
+.ai-msg-wrap.u{align-self:flex-end}
+.ai-msg{padding:9px 12px;border-radius:10px;font-size:12px;line-height:1.55;word-break:break-word}
+.ai-msg.u{background:rgba(99,102,241,.15);color:var(--t);border:1px solid rgba(99,102,241,.18);border-bottom-right-radius:3px}
+.ai-msg.b{background:var(--bg3);color:var(--t);border:1px solid var(--bd2);border-bottom-left-radius:3px}
+.ai-mt{font-size:9px;color:var(--t3);font-family:var(--mono)}
+.ai-msg code{background:var(--bg4);padding:1px 5px;border-radius:4px;font-family:var(--mono);font-size:11px;color:var(--acc2)}
+.ai-msg pre{background:var(--bg);border:1px solid var(--bd);border-radius:7px;padding:8px;margin-top:6px;overflow-x:auto;font-family:var(--mono);font-size:11px;color:var(--acc2);line-height:1.6}
+.ai-typing{display:flex;align-items:center;gap:4px;padding:8px 12px;background:var(--bg3);border-radius:10px;border:1px solid var(--bd2)}
+.ai-typing span{width:6px;height:6px;border-radius:50%;background:var(--acc6);animation:tp .8s ease-in-out infinite}
+.ai-typing span:nth-child(2){animation-delay:.15s}
+.ai-typing span:nth-child(3){animation-delay:.3s}
+@keyframes tp{0%,60%,100%{opacity:.3;transform:translateY(0)}30%{opacity:1;transform:translateY(-4px)}}
+
+/* ══ SECURITY ══ */
+.threat-row{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--bd)}
+.threat-row:last-child{border-bottom:none}
+.threat-sev{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.scan-progress{height:6px;background:var(--bg4);border-radius:99px;overflow:hidden;margin-top:4px}
+.scan-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--acc),var(--acc2));transition:width .3s}
+
+/* ══ NOTES ══ */
+#notes-editor{flex:1;outline:none;font-size:14px;line-height:1.8;color:var(--t);padding:20px;background:var(--bg);resize:none;border:none;font-family:var(--font)}
+.notes-tb{height:40px;background:var(--bg2);border-bottom:1px solid var(--bd);display:flex;align-items:center;padding:0 12px;gap:4px;flex-shrink:0}
+.ntb-btn{padding:4px 8px;border-radius:5px;cursor:pointer;font-size:12px;color:var(--t2);border:1px solid var(--bd);background:transparent;transition:all .12s}
+.ntb-btn:hover{background:var(--bg3);color:var(--t)}
+
+/* ══ CALCULATOR ══ */
+#calc-display{background:#08090c;border-radius:10px;padding:14px 16px;margin-bottom:12px;text-align:right}
+#calc-expr{font-size:11px;color:var(--t3);font-family:var(--mono);min-height:16px}
+#calc-result{font-size:28px;font-weight:700;color:var(--t);font-family:var(--mono);letter-spacing:-1px;margin-top:4px}
+.calc-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+.ck{padding:12px 6px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:600;text-align:center;transition:all .12s;user-select:none;font-family:var(--mono)}
+.ck-n{background:var(--bg3);color:var(--t);border:1px solid var(--bd2)}.ck-n:hover{background:var(--bg4)}
+.ck-op{background:rgba(99,102,241,.12);color:#a5b4fc;border:1px solid rgba(99,102,241,.2)}.ck-op:hover{background:rgba(99,102,241,.22)}
+.ck-eq{background:var(--acc);color:#fff;border:none}.ck-eq:hover{background:#4f46e5}
+.ck-c{background:rgba(239,68,68,.1);color:var(--acc5);border:1px solid rgba(239,68,68,.2)}.ck-c:hover{background:rgba(239,68,68,.2)}
+.ck-fn{background:rgba(6,182,212,.1);color:var(--acc2);border:1px solid rgba(6,182,212,.2)}.ck-fn:hover{background:rgba(6,182,212,.2)}
+
+/* ══ PASSWORDS ══ */
+.pwd-item{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--bd)}
+.pwd-item:last-child{border-bottom:none}
+.pwd-ico{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.pwd-val{font-family:var(--mono);font-size:12px;color:var(--t3);letter-spacing:2px;flex:1}
+.pwd-val.show{color:var(--acc2);letter-spacing:normal}
+
+/* ══ DISCORD ══ */
+.discord-server{display:flex;align-items:center;gap:10px;padding:10px;background:var(--bg3);border-radius:9px;margin-bottom:7px;cursor:pointer;border:1px solid var(--bd);transition:all .14s}
+.discord-server:hover{border-color:var(--bd2);background:var(--bg4)}
+.srv-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.srv-name{font-size:13px;font-weight:600;color:var(--t)}
+.srv-meta{font-size:11px;color:var(--t3);font-family:var(--mono)}
+
+/* ══ FILES ══ */
+.file-item{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--bd);cursor:pointer;transition:background .1s}
+.file-item:last-child{border-bottom:none}
+.file-item:hover{background:var(--bg3);margin:0 -17px;padding:9px 17px}
+.file-ext{width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;font-family:var(--mono)}
+
+/* ══ SIDEBAR TOGGLE ══ */
+.sb-toggle{padding:6px 10px;cursor:pointer;color:var(--t3);font-size:16px;border-radius:6px;transition:all .12s}
+.sb-toggle:hover{background:var(--bg3);color:var(--t)}
+
+#rp{width:300px;background:var(--bg2);border-left:1px solid var(--bd);display:flex;flex-direction:column;flex-shrink:0;overflow:hidden;transition:width .2s;min-height:0}
+#rp.off{width:0;border:none}
+#rp-hd{height:42px;background:var(--bg3);border-bottom:1px solid var(--bd);display:flex;align-items:center;padding:0 14px;gap:8px;flex-shrink:0}
+#rp-bd{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:10px}
+#rp-bd::-webkit-scrollbar{width:3px}
+#rp-bd::-webkit-scrollbar-thumb{background:var(--bg5)}
+.rsc{background:var(--bg3);border:1px solid var(--bd);border-radius:8px;padding:9px 11px}
+.rsc-l{font-size:9px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.8px;color:var(--t3);margin-bottom:2px}
+.rsc-v{font-size:20px;font-weight:800;color:var(--t)}
+.rlog{font-size:10px;font-family:var(--mono);padding:3px 0;border-bottom:1px solid rgba(255,255,255,.04);color:var(--t2);display:flex;gap:5px;line-height:1.4}
+.rlog:last-child{border-bottom:none}
+.rlog-t{color:var(--t3);flex-shrink:0;width:40px}
+.rban{display:flex;align-items:flex-start;gap:8px;padding:7px 0;border-bottom:1px solid var(--bd)}
+.rban:last-child{border-bottom:none}
+.rban-av{width:26px;height:26px;border-radius:50%;background:var(--acc4);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0}
+
+</style>
+</head>
+<body>
+<div id="app">
+
+<!-- ══ HEADER ══ -->
+<div id="hdr">
+  <div class="sb-toggle" onclick="toggleSb()">☰</div>
+  <div class="logo">
+    <div class="logo-icon">N3</div>
+    <div>
+      <div class="logo-name">Nathan<span>FR3</span> Suite</div>
+    </div>
+  </div>
+  <div class="hdr-pills">
+    <div class="hpill hp-g"><span class="dot"></span>Système OK</div>
+    <div class="hpill hp-b"><span class="dot"></span>Bot online</div>
+    <div class="hpill hp-y" id="hp-alerts"><span class="dot"></span><span id="alert-n">3</span> alertes</div>
+  </div>
+  <div class="hdr-r">
+    <div class="notif-wrap">
+      <div class="hdr-btn" onclick="toggleNotifs()" title="Notifications">
+        🔔<span class="nbadge" id="nbdg">3</span>
+      </div>
+      <div class="notif-panel" id="notif-panel">
+        <div class="np-hdr"><span>Notifications</span><span style="cursor:pointer;font-size:11px;color:var(--t3)" onclick="markAllRead()">Tout lire</span></div>
+        <div id="notif-list"></div>
+      </div>
+    </div>
+    <div onclick="rpToggle()" style="width:30px;height:30px;border-radius:8px;background:rgba(255,255,255,.06);border:1px solid var(--bd2);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:14px;color:var(--t2);position:relative;flex-shrink:0" title="Bot Discord">◈<span id="rp-dot" style="display:none;position:absolute;top:-2px;right:-2px;width:8px;height:8px;background:var(--acc4);border-radius:50%"></span></div><div class="uav">N</div>
+  </div>
+</div>
+
+<div id="body">
+
+<!-- ══ SIDEBAR ══ -->
+<div id="sb">
+  <div class="sb-sec">Principal</div>
+  <div class="nav on" onclick="goTo('dashboard',this)"><span class="nav-ic">⬡</span><span class="nav-lbl">Dashboard</span></div>
+
+  <div class="sb-sec">Discord</div>
+  <div class="nav" onclick="goTo('discord',this)"><span class="nav-ic">◈</span><span class="nav-lbl">Serveurs</span></div>
+  <div class="nav" onclick="goTo('bots',this)"><span class="nav-ic">◎</span><span class="nav-lbl">Bots</span><span class="nav-bd nbd-b">2</span></div>
+  <div class="nav" onclick="goTo('security-discord',this)"><span class="nav-ic">🛡</span><span class="nav-lbl">Sécurité Discord</span><span class="nav-bd nbd-r">3</span></div>
+
+  <div class="sb-sec">Développement</div>
+  <div class="nav" onclick="goTo('editor',this)"><span class="nav-ic">&lt;/&gt;</span><span class="nav-lbl">Éditeur de code</span></div>
+  <div class="nav" onclick="goTo('terminal',this)"><span class="nav-ic">▶</span><span class="nav-lbl">Terminal</span></div>
+  <div class="nav" onclick="goTo('github',this)"><span class="nav-ic">⎇</span><span class="nav-lbl">GitHub Sync</span></div>
+
+  <div class="sb-sec">Intelligence IA</div>
+  <div class="nav" onclick="goTo('ai',this)"><span class="nav-ic">✦</span><span class="nav-lbl">Claude IA</span><span class="nav-bd nbd-g">NEW</span></div>
+  <div class="nav" onclick="goTo('prompts',this)"><span class="nav-ic">◇</span><span class="nav-lbl">Générateur de prompts</span></div>
+
+  <div class="sb-sec">Système</div>
+  <div class="nav" onclick="goTo('files',this)"><span class="nav-ic">⬡</span><span class="nav-lbl">Fichiers</span></div>
+  <div class="nav" onclick="goTo('tasks',this)"><span class="nav-ic">◉</span><span class="nav-lbl">Tâches</span></div>
+  <div class="nav" onclick="goTo('perf',this)"><span class="nav-ic">◈</span><span class="nav-lbl">Performance</span></div>
+  <div class="nav" onclick="goTo('security',this)"><span class="nav-ic">🔐</span><span class="nav-lbl">Sécurité système</span></div>
+  <div class="nav" onclick="goTo('logs',this)"><span class="nav-ic">◇</span><span class="nav-lbl">Logs globaux</span></div>
+
+  <div class="sb-sec">Outils</div>
+  <div class="nav" onclick="goTo('notes',this)"><span class="nav-ic">✎</span><span class="nav-lbl">Notes</span></div>
+  <div class="nav" onclick="goTo('calc',this)"><span class="nav-ic">⊞</span><span class="nav-lbl">Calculatrice</span></div>
+  <div class="nav" onclick="goTo('passwords',this)"><span class="nav-ic">🔑</span><span class="nav-lbl">Mots de passe</span></div>
+  <div class="nav" onclick="goTo('translate',this)"><span class="nav-ic">🌐</span><span class="nav-lbl">Traducteur</span></div>
+  <div class="nav" onclick="goTo('marketplace',this)"><span class="nav-ic">◈</span><span class="nav-lbl">Marketplace</span></div>
+
+  <div class="sb-sec">Compte</div>
+  <div class="nav" onclick="goTo('settings',this)"><span class="nav-ic">⚙</span><span class="nav-lbl">Paramètres</span></div>
+
+  <div class="sb-foot">
+    <div class="sb-user">
+      <div class="uav" style="width:26px;height:26px;font-size:10px;flex-shrink:0">N</div>
+      <div style="min-width:0">
+        <div class="sb-uname">NathanFR3</div>
+        <div class="sb-ustatus"><span style="width:5px;height:5px;border-radius:50%;background:currentColor"></span>En ligne</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ PAGES ══ -->
+<div id="main">
+
+<!-- ══ DASHBOARD ══ -->
+<div class="page on" id="page-dashboard">
+  <div class="pg-scroll">
+    <div class="g4">
+      <div class="scard"><div class="slbl">Membres Discord</div><div class="sval">12,847</div><div class="sdel up">↑ +142 cette semaine</div></div>
+      <div class="scard"><div class="slbl">Bots actifs</div><div class="sval" style="color:var(--acc3)">2</div><div class="sdel up">● En ligne</div></div>
+      <div class="scard"><div class="slbl">Messages/jour</div><div class="sval" id="dash-msgs">3,291</div><div class="sdel up">↑ +18%</div></div>
+      <div class="scard"><div class="slbl">Alertes</div><div class="sval" style="color:var(--acc5)">3</div><div class="sdel dn">↑ Nouvelles</div></div>
+    </div>
+    <div class="g2">
+      <div class="card">
+        <div class="card-hdr"><span class="card-ttl">Activité réseau</span><span id="dash-speed" class="bdg bdg-g">↑ 1.2 MB/s</span></div>
+        <svg class="spark" viewBox="0 0 260 36" preserveAspectRatio="none">
+          <polyline id="spark-l" points="0,30 32,24 65,14 97,20 130,7 162,14 195,4 228,10 260,5" fill="none" stroke="var(--acc)" stroke-width="1.5" stroke-linecap="round"/>
+          <polyline id="spark-f" points="0,30 32,24 65,14 97,20 130,7 162,14 195,4 228,10 260,5 260,36 0,36" fill="var(--acc)" fill-opacity="0.07"/>
+        </svg>
+      </div>
+      <div class="card">
+        <div class="card-hdr"><span class="card-ttl">Ressources système</span></div>
+        <div style="display:flex;flex-direction:column;gap:9px">
+          <div><div class="rsb" style="margin-bottom:3px;font-size:12px"><span style="color:var(--t2)">CPU</span><span style="font-family:var(--mono);color:var(--t2)" id="cpu-v">34%</span></div><div class="prog"><div class="prog-f" id="cpu-b" style="width:34%;background:var(--acc)"></div></div></div>
+          <div><div class="rsb" style="margin-bottom:3px;font-size:12px"><span style="color:var(--t2)">RAM</span><span style="font-family:var(--mono);color:var(--t2)" id="ram-v">61%</span></div><div class="prog"><div class="prog-f" id="ram-b" style="width:61%;background:var(--acc4)"></div></div></div>
+          <div><div class="rsb" style="margin-bottom:3px;font-size:12px"><span style="color:var(--t2)">Disque</span><span style="font-family:var(--mono);color:var(--t2)">42%</span></div><div class="prog"><div class="prog-f" style="width:42%;background:var(--acc3)"></div></div></div>
+        </div>
+      </div>
+    </div>
+    <div class="g3">
+      <div class="card">
+        <div class="card-hdr"><span class="card-ttl">Bots Discord</span></div>
+        <div style="display:flex;flex-direction:column;gap:8px;font-size:12px">
+          <div class="rsb"><div class="row" style="gap:7px"><div style="width:7px;height:7px;border-radius:50%;background:var(--acc3);box-shadow:0 0 5px rgba(16,185,129,.4)"></div><span>nathanfr3</span></div><span style="font-family:var(--mono);color:var(--acc3)">42ms</span></div>
+          <div class="rsb"><div class="row" style="gap:7px"><div style="width:7px;height:7px;border-radius:50%;background:var(--acc3);box-shadow:0 0 5px rgba(16,185,129,.4)"></div><span>nathanfr3-dev</span></div><span style="font-family:var(--mono);color:var(--acc3)">38ms</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-hdr"><span class="card-ttl">Sécurité</span></div>
+        <div style="display:flex;flex-direction:column;gap:7px;font-size:12px">
+          <div class="rsb"><span style="color:var(--t2)">Anti-raid</span><span class="bdg bdg-g">ACTIF</span></div>
+          <div class="rsb"><span style="color:var(--t2)">Anti-spam</span><span class="bdg bdg-g">ACTIF</span></div>
+          <div class="rsb"><span style="color:var(--t2)">Antivirus</span><span class="bdg bdg-g">PROPRE</span></div>
+          <div class="rsb"><span style="color:var(--t2)">Menaces</span><span class="bdg bdg-r">3 détectées</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-hdr"><span class="card-ttl">GitHub</span></div>
+        <div style="display:flex;flex-direction:column;gap:7px;font-size:12px">
+          <div class="rsb"><span style="color:var(--t2)">Repo</span><span style="font-family:var(--mono);color:var(--acc2);font-size:10px">apptest1</span></div>
+          <div class="rsb"><span style="color:var(--t2)">Branche</span><span style="font-family:var(--mono);color:var(--t2)">main</span></div>
+          <div class="rsb"><span style="color:var(--t2)">Statut</span><span class="bdg bdg-g">Synchronisé</span></div>
+          <button class="btn btn-p btn-sm" style="width:100%;margin-top:4px" onclick="goTo('github',null)">↑ Push maintenant</button>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-hdr"><div><div class="card-ttl">Logs en temps réel</div><div class="card-sub">Auto-refresh 3s</div></div><button class="btn btn-g btn-sm" onclick="goTo('logs',null)">Voir tout →</button></div>
+      <div id="dash-logs"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ DISCORD SERVEURS ══ -->
+<div class="page" id="page-discord">
+  <div class="pg-scroll">
+    <div class="g3">
+      <div class="scard"><div class="slbl">Serveurs</div><div class="sval">3</div><div class="sdel neu">Gérés</div></div>
+      <div class="scard"><div class="slbl">Total membres</div><div class="sval">16,948</div><div class="sdel up">↑ +184</div></div>
+      <div class="scard"><div class="slbl">Canaux</div><div class="sval">69</div><div class="sdel neu">Stables</div></div>
+    </div>
+    <div class="card">
+      <div class="card-hdr"><span class="card-ttl">Mes serveurs</span><button class="btn btn-p btn-sm">+ Ajouter un bot</button></div>
+      <div class="discord-server"><div class="srv-icon" style="background:rgba(99,102,241,.15)">🎮</div><div style="flex:1"><div class="srv-name">NathanFR3 Official</div><div class="srv-meta">12,847 membres · 42 canaux · bot actif</div></div><span class="bdg bdg-b">Admin</span></div>
+      <div class="discord-server"><div class="srv-icon" style="background:rgba(16,185,129,.12)">🛡️</div><div style="flex:1"><div class="srv-name">Dev Community</div><div class="srv-meta">3,210 membres · 18 canaux · bot actif</div></div><span class="bdg bdg-b">Admin</span></div>
+      <div class="discord-server"><div class="srv-icon" style="background:rgba(245,158,11,.1)">🌐</div><div style="flex:1"><div class="srv-name">Gaming Hub</div><div class="srv-meta">891 membres · 9 canaux</div></div><span class="bdg bdg-c">Modo</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ BOTS ══ -->
+<div class="page" id="page-bots">
+  <div class="pg-scroll">
+    <div class="card">
+      <div class="card-hdr">
+  <span class="card-ttl">Bots actifs</span>
+  <div style="display:flex;gap:6px;align-items:center">
+    <input id="rp-bot-id-inp" placeholder="Application ID (17-20 chiffres)" style="background:var(--bg3);border:1px solid var(--bd2);border-radius:6px;color:var(--t);font-size:11px;padding:5px 8px;outline:none;font-family:var(--mono);width:190px" value=""/>
+    <button class="btn btn-p btn-sm" onclick="rpConnectBot()">Connecter</button>
+  </div>
+</div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div style="display:flex;align-items:center;gap:10px;padding:10px;background:var(--bg3);border-radius:9px">
+          <div style="width:40px;height:40px;border-radius:50%;background:var(--acc);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:#fff">N3</div>
+          <div style="flex:1"><div style="font-size:13px;font-weight:600">nathanfr3</div><div style="font-size:11px;color:var(--t3);font-family:var(--mono)">ID: 1187364829 · ping: 42ms</div></div>
+          <div style="width:8px;height:8px;border-radius:50%;background:var(--acc3);box-shadow:0 0 6px rgba(16,185,129,.5)"></div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;padding:10px;background:var(--bg3);border-radius:9px">
+          <div style="width:40px;height:40px;border-radius:50%;background:var(--acc6);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:#fff">D</div>
+          <div style="flex:1"><div style="font-size:13px;font-weight:600">nathanfr3-dev</div><div style="font-size:11px;color:var(--t3);font-family:var(--mono)">ID: 1187364830 · ping: 38ms</div></div>
+          <div style="width:8px;height:8px;border-radius:50%;background:var(--acc3);box-shadow:0 0 6px rgba(16,185,129,.5)"></div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-hdr"><span class="card-ttl">Paramètres du bot</span></div>
+      <div style="display:flex;flex-direction:column;gap:0">
+        <div class="rsb" style="padding:10px 0;border-bottom:1px solid var(--bd)"><div><div style="font-size:13px;font-weight:600">Statut dynamique</div><div style="font-size:11px;color:var(--t3);font-family:var(--mono)">Actif quand l'app est ouverte</div></div><div class="tog on" onclick="this.classList.toggle('on')"></div></div>
+        <div class="rsb" style="padding:10px 0;border-bottom:1px solid var(--bd)"><div><div style="font-size:13px;font-weight:600">Logs connectés au dashboard</div><div style="font-size:11px;color:var(--t3);font-family:var(--mono)">Sync en temps réel</div></div><div class="tog on" onclick="this.classList.toggle('on')"></div></div>
+        <div class="rsb" style="padding:10px 0;border-bottom:1px solid var(--bd)"><div><div style="font-size:13px;font-weight:600">Commandes slash</div><div style="font-size:11px;color:var(--t3);font-family:var(--mono)">/kick /ban /mute /warn /info</div></div><div class="tog on" onclick="this.classList.toggle('on')"></div></div>
+        <div class="rsb" style="padding:10px 0"><div><div style="font-size:13px;font-weight:600">Auto-modération</div><div style="font-size:11px;color:var(--t3);font-family:var(--mono)">Spam + raid + bots suspects</div></div><div class="tog on" onclick="this.classList.toggle('on')"></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SECURITY DISCORD ══ -->
+<div class="page" id="page-security-discord">
+  <div class="pg-scroll">
+    <div class="card">
+      <div class="card-hdr"><span class="card-ttl">Alertes actives</span><span class="bdg bdg-r">3 menaces</span></div>
+      <div class="threat-row"><div class="threat-sev" style="background:var(--acc5)"></div><div style="flex:1"><div style="font-size:12px;font-weight:600">Tentative de raid — 47 comptes suspects</div><div style="font-size:10px;color:var(--t3);font-family:var(--mono)">14:32 · NathanFR3 Official</div></div><span class="bdg bdg-r">ÉLEVÉ</span><button class="btn btn-d btn-sm">Bloquer</button></div>
+      <div class="threat-row"><div class="threat-sev" style="background:var(--acc4)"></div><div style="flex:1"><div style="font-size:12px;font-weight:600">Spam massif — canal #général (zap8821)</div><div style="font-size:10px;color:var(--t3);font-family:var(--mono)">13:11 · NathanFR3 Official</div></div><span class="bdg bdg-y">MOYEN</span><button class="btn btn-d btn-sm">Mute</button></div>
+      <div class="threat-row"><div class="threat-sev" style="background:var(--acc3)"></div><div style="flex:1"><div style="font-size:12px;font-weight:600">Bot non autorisé — invitation bloquée</div><div style="font-size:10px;color:var(--t3);font-family:var(--mono)">09:04 · Gaming Hub</div></div><span class="bdg bdg-g">FAIBLE</span><button class="btn btn-g btn-sm">Ignorer</button></div>
+    </div>
+    <div class="card">
+      <div class="card-hdr"><span class="card-ttl">Protection active</span></div>
+      <div style="display:flex;flex-direction:column;gap:0">
+        <div class="rsb" style="padding:10px 0;border-bottom:1px solid var(--bd)"><div><div style="font-size:13px;font-weight:600">Anti-raid</div><div style="font-size:11px;color:var(--t3);font-family:var(--mono)">Verrou si +5 joins/seconde</div></div><div class="tog on" onclick="this.classList.toggle('on')"></div></div>
+        <div class="rsb" style="padding:10px 0;border-bottom:1px solid var(--bd)"><div><div style="font-size:13px;font-weight:600">Anti-spam</div><div style="font-size:11px;color:var(--t3);font-family:var(--mono)">Détection messages répétitifs</div></div><div class="tog on" onclick="this.classList.toggle('on')"></div></div>
+        <div class="rsb" style="padding:10px 0;border-bottom:1px solid var(--bd)"><div><div style="font-size:13px;font-weight:600">Blocage bots suspects</div><div style="font-size:11px;color:var(--t3);font-family:var(--mono)">Validation avant accès</div></div><div class="tog on" onclick="this.classList.toggle('on')"></div></div>
+        <div class="rsb" style="padding:10px 0"><div><div style="font-size:13px;font-weight:600">Détection comptes suspects</div><div style="font-size:11px;color:var(--t3);font-family:var(--mono)">Moins de 7 jours, pas d'avatar</div></div><div class="tog on" onclick="this.classList.toggle('on')"></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ EDITOR ══ -->
+<div class="page" id="page-editor" style="flex-direction:column">
+  <div id="editor-shell">
+    <div id="etabs"></div>
+    <div id="ecw">
+      <div id="eln"></div>
+      <div id="ecode" contenteditable="true" spellcheck="false"
+        onkeydown="eKey(event)" oninput="eInput()" onclick="ePos()"></div>
+    </div>
+    <div id="ekb">
+      <div class="ekk" style="background:rgba(99,102,241,.1);color:#a5b4fc;border-color:rgba(99,102,241,.2)" onclick="eIns('  ')">Tab</div>
+      <div class="ekk" onclick="eIns('{}')">{ }</div>
+      <div class="ekk" onclick="eIns('()')">( )</div>
+      <div class="ekk" onclick="eIns('[]')">[ ]</div>
+      <div class="ekk" onclick="eIns('=>')">=></div>
+      <div class="ekk" onclick="eIns('\"\"')">"</div>
+      <div class="ekk" onclick="eIns(';')">;</div>
+      <div class="ekk" onclick="eIns('// ')">// </div>
+      <div class="ekk" onclick="eIns('console.log()')">log</div>
+      <div class="ekk" onclick="eIns('const  = ')">const</div>
+      <div class="ekk" onclick="eIns('async function() {\n  \n}')">async fn</div>
+      <div class="ekk" style="background:rgba(236,72,153,.08);color:var(--acc6);border-color:rgba(236,72,153,.18)" onclick="eAI('Explique ce code')">✦ Expliquer</div>
+      <div class="ekk" style="background:rgba(236,72,153,.08);color:var(--acc6);border-color:rgba(236,72,153,.18)" onclick="eAI('Corrige ce code')">✦ Corriger</div>
+      <div class="ekk" style="background:rgba(236,72,153,.08);color:var(--acc6);border-color:rgba(236,72,153,.18)" onclick="eAI('Génère du code')">✦ Générer</div>
+    </div>
+    <div id="esb">
+      <span class="esbi">⎇ main</span>
+      <div class="esbi-r">
+        <span class="esbi" id="esb-lang">JavaScript</span>
+        <span class="esbi" id="esb-pos">Ln 1, Col 1</span>
+        <span class="esbi">UTF-8</span>
+        <span class="esbi" id="esb-sv" style="color:rgba(16,185,129,.7)">✓ Sauvegardé</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ TERMINAL ══ -->
+<div class="page" id="page-terminal" style="flex-direction:column">
+  <div id="term-shell">
+    <div id="th">
+      <div class="tdot" style="background:#ff5f57"></div>
+      <div class="tdot" style="background:#febc2e"></div>
+      <div class="tdot" style="background:#28c840"></div>
+      <div id="ttabs">
+        <div class="ttab on" onclick="tSwitch(this,'bash')">bash</div>
+        <div class="ttab" onclick="tSwitch(this,'node')">node</div>
+        <div class="ttab" onclick="tSwitch(this,'git')">git</div>
+        <div class="ttab" onclick="tAdd()">+</div>
+      </div>
+      <div style="margin-left:auto;display:flex;gap:4px">
+        <div style="width:24px;height:22px;display:flex;align-items:center;justify-content:center;cursor:pointer;border-radius:4px;color:var(--t3);font-size:12px" onclick="tClear()">⌫</div>
+      </div>
+    </div>
+    <div id="tout"></div>
+    <div id="tsug"></div>
+    <div id="trow">
+      <span id="tps">~/apptest1 $</span>
+      <input id="tinp" autocomplete="off" spellcheck="false"
+        onkeydown="tKey(event)" oninput="tSug(this.value)" placeholder="commande..."/>
+    </div>
+  </div>
+</div>
+
+<!-- ══ GITHUB SYNC ══ -->
+<div class="page" id="page-github">
+  <div class="pg-scroll">
+    <div class="g3">
+      <div class="scard"><div class="slbl">Commits</div><div class="sval" id="gh-commits">3</div><div class="sdel up">↑ Actif</div></div>
+      <div class="scard"><div class="slbl">Dernier push</div><div class="sval" style="font-size:14px;margin-top:6px" id="gh-lastpush">—</div></div>
+      <div class="scard"><div class="slbl">Auto-sync</div><div class="sval" style="color:var(--acc3)">ON</div><div class="sdel up">Actif</div></div>
+    </div>
+    <div class="card">
+      <div class="card-hdr"><span class="card-ttl">Push manuel</span></div>
+      <div style="display:flex;gap:8px;margin-bottom:10px">
+        <input class="inp" id="gh-msg" placeholder="Message de commit..." style="flex:1"/>
+        <button class="btn btn-p" onclick="ghPush()">↑ Push</button>
+      </div>
+      <div id="gh-status" style="font-size:11px;font-family:var(--mono);color:var(--t3)"></div>
+    </div>
+    <div class="card">
+      <div class="card-hdr"><span class="card-ttl">Historique</span></div>
+      <div id="gh-history" style="font-family:var(--mono);font-size:11px;display:flex;flex-direction:column;gap:8px"></div>
+    </div>
+    <div class="card">
+      <div class="card-hdr"><span class="card-ttl">Auto-sync watcher</span></div>
+      <div style="display:flex;flex-direction:column;gap:0">
+        <div class="rsb" style="padding:10px 0;border-bottom:1px solid var(--bd)"><div><div style="font-size:13px;font-weight:600">Sync automatique</div><div style="font-size:11px;color:var(--t3);font-family:var(--mono)">Push dès qu'un fichier change</div></div><div class="tog on" onclick="this.classList.toggle('on')"></div></div>
+        <div class="rsb" style="padding:10px 0"><div><div style="font-size:13px;font-weight:600">GitHub Pages</div><div style="font-size:11px;color:var(--acc2);font-family:var(--mono)">lolp4686-source.github.io/apptest1</div></div><span class="bdg bdg-g">Live</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ CLAUDE IA ══ -->
+<div class="page" id="page-ai" style="flex-direction:column;overflow:hidden">
+  <div style="padding:14px 16px;background:var(--bg2);border-bottom:1px solid var(--bd);flex-shrink:0">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+      <div style="width:32px;height:32px;background:rgba(236,72,153,.15);border:1px solid rgba(236,72,153,.3);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:15px">✦</div>
+      <div><div style="font-size:14px;font-weight:700">Claude IA</div><div style="font-size:10px;color:var(--t3);font-family:var(--mono)">claude-sonnet-4-20250514 · Mémoire activée</div></div>
+    </div>
+    <div style="display:flex;gap:6px;align-items:center">
+      <input id="ai-key" type="password" class="inp" style="flex:1" placeholder="Clé API Anthropic (sk-ant-...)"/>
+      <button class="btn btn-p btn-sm" onclick="aiSaveKey()">Sauver</button>
+    </div>
+    <div id="ai-kst" style="font-size:10px;margin-top:5px;font-family:var(--mono);color:var(--t3)">Clé requise → console.anthropic.com</div>
+    <div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:8px">
+      <div class="ekk" style="background:rgba(236,72,153,.08);color:var(--acc6);border-color:rgba(236,72,153,.18);cursor:pointer" onclick="aiAsk('Explique ce code')">Expliquer code</div>
+      <div class="ekk" style="background:rgba(236,72,153,.08);color:var(--acc6);border-color:rgba(236,72,153,.18);cursor:pointer" onclick="aiAsk('Génère une fonction JavaScript pour')">Générer code</div>
+      <div class="ekk" style="background:rgba(236,72,153,.08);color:var(--acc6);border-color:rgba(236,72,153,.18);cursor:pointer" onclick="aiAsk('Comment réparer une voiture')">Aide technique</div>
+      <div class="ekk" style="background:rgba(236,72,153,.08);color:var(--acc6);border-color:rgba(236,72,153,.18);cursor:pointer" onclick="aiAsk('Explique comment fonctionne Discord.js')">Discord.js</div>
+      <div class="ekk" style="background:rgba(236,72,153,.08);color:var(--acc6);border-color:rgba(236,72,153,.18);cursor:pointer" onclick="aiAsk('Quels sont mes fichiers et préférences sauvegardés ?')">Ma mémoire ✦</div>
+    </div>
+  </div>
+  <div id="ai-messages" style="flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px">
+    <div style="display:flex;flex-direction:column;gap:3px;max-width:92%">
+      <div class="ai-msg b">Bonjour ! Je suis <code>Claude</code>, ton assistant IA intégré dans NathanFR3 Suite.<br><br>Je peux t'aider avec :<br>• Ton code (expliquer, corriger, générer)<br>• Des questions techniques (mécanique, informatique, etc.)<br>• La gestion de tes bots Discord<br>• La sécurité de ton système<br><br>J'ai une <code>mémoire interne</code> — dis-moi des infos à retenir et je m'en souviendrai dans nos prochaines conversations.<br><br>Entre ta clé API pour commencer ↑</div>
+      <span class="ai-mt">maintenant</span>
+    </div>
+  </div>
+  <div style="padding:10px 14px;border-top:1px solid var(--bd);background:var(--bg2);flex-shrink:0">
+    <div style="display:flex;align-items:center;gap:6px;margin-bottom:7px">
+      <span id="ai-ctx-b" style="font-size:10px;padding:2px 8px;border-radius:99px;background:rgba(6,182,212,.1);color:var(--acc2);border:1px solid rgba(6,182,212,.2);font-family:var(--mono)">◈ Contexte éditeur actif</span>
+      <span id="ai-mem-b" style="font-size:10px;padding:2px 8px;border-radius:99px;background:rgba(236,72,153,.08);color:var(--acc6);border:1px solid rgba(236,72,153,.18);font-family:var(--mono)">✦ Mémoire : <span id="ai-mem-n">0</span> entrées</span>
+    </div>
+    <div style="display:flex;gap:6px;align-items:flex-end">
+      <textarea id="ai-ta" class="inp" style="flex:1;resize:none;min-height:38px;max-height:100px;line-height:1.5" placeholder="Pose une question..." rows="1"
+        onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();aiSend()}"
+        oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,100)+'px'"></textarea>
+      <button id="ai-sendbtn" onclick="aiSend()" style="width:36px;height:36px;background:var(--acc6);border:none;border-radius:8px;cursor:pointer;color:#fff;font-size:15px;flex-shrink:0;transition:all .14s">↑</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ PROMPT GENERATOR ══ -->
+<div class="page" id="page-prompts">
+  <div class="pg-scroll">
+    <div class="card">
+      <div class="card-hdr"><span class="card-ttl">Générateur de prompts</span></div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div><label style="font-size:11px;color:var(--t2);display:block;margin-bottom:4px">Domaine</label>
+          <select class="inp" id="prompt-domain" style="width:100%;cursor:pointer">
+            <option>Développement web</option><option>Discord bots</option><option>Intelligence artificielle</option>
+            <option>Cybersécurité</option><option>Base de données</option><option>API REST</option>
+            <option>React / JavaScript</option><option>Python</option><option>Mécanique</option>
+          </select>
+        </div>
+        <div><label style="font-size:11px;color:var(--t2);display:block;margin-bottom:4px">Tâche à accomplir</label>
+          <input class="inp" id="prompt-task" style="width:100%" placeholder="Ex: Créer un système d'authentification JWT..."/>
+        </div>
+        <div><label style="font-size:11px;color:var(--t2);display:block;margin-bottom:4px">Niveau de détail</label>
+          <select class="inp" id="prompt-detail" style="width:100%;cursor:pointer">
+            <option>Débutant (simple et clair)</option><option>Intermédiaire (avec explications)</option><option>Expert (technique avancé)</option>
+          </select>
+        </div>
+        <button class="btn btn-p" onclick="genPrompt()">✦ Générer le prompt</button>
+        <div id="prompt-result" style="display:none">
+          <div style="font-size:11px;color:var(--t2);margin-bottom:6px">Prompt généré :</div>
+          <div id="prompt-txt" style="background:var(--bg3);border:1px solid var(--bd2);border-radius:8px;padding:12px;font-size:12px;color:var(--t);line-height:1.7;font-family:var(--mono)"></div>
+          <button class="btn btn-g btn-sm" style="margin-top:8px" onclick="copyPrompt()">⎘ Copier</button>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-hdr"><span class="card-ttl">Prompts sauvegardés</span></div>
+      <div id="saved-prompts" style="display:flex;flex-direction:column;gap:7px"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ FILES ══ -->
+<div class="page" id="page-files">
+  <div class="pg-scroll">
+    <div class="g3">
+      <div class="scard"><div class="slbl">Fichiers</div><div class="sval">47</div><div class="sdel neu">Total</div></div>
+      <div class="scard"><div class="slbl">Dossiers</div><div class="sval">12</div></div>
+      <div class="scard"><div class="slbl">Taille totale</div><div class="sval" style="font-size:16px;margin-top:8px">284 MB</div></div>
+    </div>
+    <div class="card">
+      <div class="card-hdr"><span class="card-ttl">Explorateur — apptest1</span><button class="btn btn-p btn-sm">+ Nouveau</button></div>
+      <div id="file-list"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ TASKS ══ -->
+<div class="page" id="page-tasks">
+  <div class="pg-scroll">
+    <div class="g3">
+      <div class="scard"><div class="slbl">En cours</div><div class="sval">5</div><div class="sdel up">Actives</div></div>
+      <div class="scard"><div class="slbl">Terminées</div><div class="sval">12</div><div class="sdel up">Cette semaine</div></div>
+      <div class="scard"><div class="slbl">CPU</div><div class="sval" id="task-cpu">34%</div></div>
+    </div>
+    <div class="card">
+      <div class="card-hdr"><span class="card-ttl">Processus actifs</span><button class="btn btn-g btn-sm" onclick="refreshTasks()">↺ Actualiser</button></div>
+      <table>
+        <tr><th>Processus</th><th>CPU</th><th>RAM</th><th>Statut</th><th>Action</th></tr>
+        <tr><td style="font-family:var(--mono)">node (nathanfr3-bot)</td><td style="font-family:var(--mono);color:var(--acc3)">2.1%</td><td style="font-family:var(--mono)">312 MB</td><td><span class="bdg bdg-g">running</span></td><td><button class="btn btn-g btn-sm">Stop</button></td></tr>
+        <tr><td style="font-family:var(--mono)">node (dev-bot)</td><td style="font-family:var(--mono);color:var(--acc3)">1.4%</td><td style="font-family:var(--mono)">289 MB</td><td><span class="bdg bdg-g">running</span></td><td><button class="btn btn-g btn-sm">Stop</button></td></tr>
+        <tr><td style="font-family:var(--mono)">mongod</td><td style="font-family:var(--mono);color:var(--acc4)">4.8%</td><td style="font-family:var(--mono)">1.2 GB</td><td><span class="bdg bdg-g">running</span></td><td><button class="btn btn-g btn-sm">Stop</button></td></tr>
+        <tr><td style="font-family:var(--mono)">chrome</td><td style="font-family:var(--mono);color:var(--acc5)">18.2%</td><td style="font-family:var(--mono)">2.4 GB</td><td><span class="bdg bdg-y">high</span></td><td><button class="btn btn-d btn-sm">Kill</button></td></tr>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ══ PERFORMANCE ══ -->
+<div class="page" id="page-perf">
+  <div class="pg-scroll">
+    <div class="g4">
+      <div class="scard"><div class="slbl">CPU</div><div class="sval" id="perf-cpu">34%</div><div class="sdel up">Normal</div></div>
+      <div class="scard"><div class="slbl">RAM</div><div class="sval" id="perf-ram">61%</div><div class="sdel neu">4.9/8 GB</div></div>
+      <div class="scard"><div class="slbl">Disque</div><div class="sval">42%</div><div class="sdel neu">210/500 GB</div></div>
+      <div class="scard"><div class="slbl">Réseau</div><div class="sval" id="perf-net" style="font-size:14px;margin-top:8px">1.2 MB/s</div></div>
+    </div>
+    <div class="g2">
+      <div class="card">
+        <div class="card-hdr"><span class="card-ttl">CPU par core</span></div>
+        <div id="cores" style="display:flex;flex-direction:column;gap:8px"></div>
+      </div>
+      <div class="card">
+        <div class="card-hdr"><span class="card-ttl">Mémoire</span></div>
+        <div style="display:flex;flex-direction:column;gap:9px">
+          <div><div class="rsb" style="margin-bottom:3px;font-size:12px"><span style="color:var(--t2)">Utilisée</span><span style="font-family:var(--mono)" id="mem-v">61%</span></div><div class="prog"><div class="prog-f" id="mem-b" style="background:var(--acc4)"></div></div></div>
+          <div><div class="rsb" style="margin-bottom:3px;font-size:12px"><span style="color:var(--t2)">Cache</span><span style="font-family:var(--mono)">18%</span></div><div class="prog"><div class="prog-f" style="width:18%;background:var(--acc2)"></div></div></div>
+          <div><div class="rsb" style="margin-bottom:3px;font-size:12px"><span style="color:var(--t2)">Libre</span><span style="font-family:var(--mono)">21%</span></div><div class="prog"><div class="prog-f" style="width:21%;background:var(--acc3)"></div></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SECURITY SYSTEM ══ -->
+<div class="page" id="page-security">
+  <div class="pg-scroll">
+    <div class="g3">
+      <div class="scard"><div class="slbl">Statut antivirus</div><div class="sval" style="color:var(--acc3)">PROPRE</div><div class="sdel up">0 menaces</div></div>
+      <div class="scard"><div class="slbl">Dernière analyse</div><div class="sval" style="font-size:14px;margin-top:8px">il y a 2h</div></div>
+      <div class="scard"><div class="slbl">Mots de passe</div><div class="sval">8</div><div class="sdel neu">Sauvegardés</div></div>
+    </div>
+    <div class="card">
+      <div class="card-hdr"><span class="card-ttl">Analyse système</span></div>
+      <div id="scan-status" style="font-size:12px;color:var(--t2);margin-bottom:8px">Prêt à analyser</div>
+      <div class="scan-progress"><div class="scan-fill" id="scan-fill" style="width:0%"></div></div>
+      <button class="btn btn-p" style="margin-top:10px" onclick="startScan()">▶ Lancer l'analyse</button>
+    </div>
+    <div class="card">
+      <div class="card-hdr"><span class="card-ttl">Menaces détectées</span></div>
+      <div style="font-size:12px;color:var(--t2);padding:20px;text-align:center;font-family:var(--mono)">
+        ✓ Aucune menace détectée lors de la dernière analyse
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ LOGS ══ -->
+<div class="page" id="page-logs">
+  <div class="pg-scroll">
+    <div class="card">
+      <div class="card-hdr">
+        <div><div class="card-ttl">Logs globaux</div><div class="card-sub" id="log-count-lbl">0 entrées</div></div>
+        <div class="row" style="gap:6px">
+          <button class="btn btn-g btn-sm" onclick="filterLog('all')">Tous</button>
+          <button class="btn btn-g btn-sm" onclick="filterLog('err')">Erreurs</button>
+          <button class="btn btn-g btn-sm" onclick="filterLog('warn')">Warnings</button>
+          <button class="btn btn-d btn-sm" onclick="allLogs=[];rLogs()">Effacer</button>
+        </div>
+      </div>
+      <div id="log-box" style="font-family:var(--mono);font-size:11px;max-height:500px;overflow-y:auto"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ NOTES ══ -->
+<div class="page" id="page-notes" style="flex-direction:column">
+  <div class="notes-tb">
+    <button class="ntb-btn" onclick="document.execCommand('bold')"><b>B</b></button>
+    <button class="ntb-btn" onclick="document.execCommand('italic')"><i>I</i></button>
+    <button class="ntb-btn" onclick="document.execCommand('underline')"><u>U</u></button>
+    <button class="ntb-btn" onclick="document.execCommand('insertUnorderedList')">• Liste</button>
+    <button class="ntb-btn" onclick="document.execCommand('formatBlock','',  'h2')">H2</button>
+    <div style="margin-left:auto;display:flex;gap:4px">
+      <button class="ntb-btn" onclick="saveNote()">💾 Sauver</button>
+      <button class="ntb-btn" onclick="exportNote()">↓ PDF</button>
+      <button class="ntb-btn" onclick="clearNote()">✕ Effacer</button>
+    </div>
+  </div>
+  <div id="notes-editor" contenteditable="true" style="flex:1;outline:none;font-size:14px;line-height:1.8;color:var(--t);padding:20px;background:var(--bg);overflow-y:auto" placeholder="Commence à écrire ta note..."></div>
+</div>
+
+<!-- ══ CALCULATOR ══ -->
+<div class="page" id="page-calc">
+  <div class="pg-scroll">
+    <div style="max-width:360px;margin:0 auto">
+      <div id="calc-display">
+        <div id="calc-expr"></div>
+        <div id="calc-result">0</div>
+      </div>
+      <div class="calc-grid">
+        <div class="ck ck-fn" onclick="calcKey('sin(')">sin</div>
+        <div class="ck ck-fn" onclick="calcKey('cos(')">cos</div>
+        <div class="ck ck-fn" onclick="calcKey('tan(')">tan</div>
+        <div class="ck ck-fn" onclick="calcKey('Math.sqrt(')">√</div>
+        <div class="ck ck-fn" onclick="calcKey('Math.PI')">π</div>
+        <div class="ck ck-c" onclick="calcClear()">C</div>
+        <div class="ck ck-c" onclick="calcDel()">⌫</div>
+        <div class="ck ck-op" onclick="calcKey('(')">(</div>
+        <div class="ck ck-op" onclick="calcKey(')')">)</div>
+        <div class="ck ck-op" onclick="calcKey('%')">%</div>
+        <div class="ck ck-n" onclick="calcKey('7')">7</div>
+        <div class="ck ck-n" onclick="calcKey('8')">8</div>
+        <div class="ck ck-n" onclick="calcKey('9')">9</div>
+        <div class="ck ck-op" onclick="calcKey('/')">÷</div>
+        <div class="ck ck-fn" onclick="calcKey('**')">xⁿ</div>
+        <div class="ck ck-n" onclick="calcKey('4')">4</div>
+        <div class="ck ck-n" onclick="calcKey('5')">5</div>
+        <div class="ck ck-n" onclick="calcKey('6')">6</div>
+        <div class="ck ck-op" onclick="calcKey('*')">×</div>
+        <div class="ck ck-fn" onclick="calcKey('Math.log(')">ln</div>
+        <div class="ck ck-n" onclick="calcKey('1')">1</div>
+        <div class="ck ck-n" onclick="calcKey('2')">2</div>
+        <div class="ck ck-n" onclick="calcKey('3')">3</div>
+        <div class="ck ck-op" onclick="calcKey('-')">−</div>
+        <div class="ck ck-eq" onclick="calcEval()" style="grid-row:span 2">=</div>
+        <div class="ck ck-n" onclick="calcKey('0')" style="grid-column:span 2">0</div>
+        <div class="ck ck-n" onclick="calcKey('.')">.</div>
+        <div class="ck ck-op" onclick="calcKey('+')">+</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ PASSWORDS ══ -->
+<div class="page" id="page-passwords">
+  <div class="pg-scroll">
+    <div class="card">
+      <div class="card-hdr"><span class="card-ttl">Mots de passe sauvegardés</span><button class="btn btn-p btn-sm" onclick="addPwd()">+ Ajouter</button></div>
+      <div id="pwd-list"></div>
+    </div>
+    <div class="card">
+      <div class="card-hdr"><span class="card-ttl">Générateur</span></div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div class="rsb"><span style="font-size:12px;color:var(--t2)">Longueur</span><input type="range" min="8" max="32" value="16" id="pwd-len" oninput="genPwd()" style="width:120px"/><span style="font-size:11px;font-family:var(--mono);color:var(--t2);width:24px;text-align:center" id="pwd-len-v">16</span></div>
+        <div id="pwd-gen" style="background:var(--bg3);border:1px solid var(--bd2);border-radius:8px;padding:10px;font-family:var(--mono);font-size:13px;color:var(--acc2);letter-spacing:1px;word-break:break-all"></div>
+        <div style="display:flex;gap:6px">
+          <button class="btn btn-g btn-sm" onclick="genPwd()">↺ Regénérer</button>
+          <button class="btn btn-g btn-sm" onclick="copyPwd()">⎘ Copier</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ TRANSLATOR ══ -->
+<div class="page" id="page-translate">
+  <div class="pg-scroll">
+    <div class="card">
+      <div class="card-hdr"><span class="card-ttl">Traducteur</span><span style="font-size:11px;color:var(--t3);font-family:var(--mono)">Alimenté par Claude IA</span></div>
+      <div class="g2" style="margin-bottom:10px">
+        <div>
+          <label style="font-size:11px;color:var(--t2);display:block;margin-bottom:4px">De</label>
+          <select class="inp" id="tr-from" style="width:100%;cursor:pointer">
+            <option value="auto">Détection auto</option><option value="fr">Français</option><option value="en">Anglais</option>
+            <option value="es">Espagnol</option><option value="de">Allemand</option><option value="it">Italien</option>
+            <option value="pt">Portugais</option><option value="ja">Japonais</option><option value="zh">Chinois</option>
+            <option value="ar">Arabe</option>
+          </select>
+        </div>
+        <div>
+          <label style="font-size:11px;color:var(--t2);display:block;margin-bottom:4px">Vers</label>
+          <select class="inp" id="tr-to" style="width:100%;cursor:pointer">
+            <option value="en">Anglais</option><option value="fr">Français</option><option value="es">Espagnol</option>
+            <option value="de">Allemand</option><option value="it">Italien</option><option value="pt">Portugais</option>
+            <option value="ja">Japonais</option><option value="zh">Chinois</option><option value="ar">Arabe</option>
+          </select>
+        </div>
+      </div>
+      <textarea class="inp" id="tr-input" style="width:100%;min-height:100px;resize:vertical" placeholder="Texte à traduire..."></textarea>
+      <button class="btn btn-p" style="margin-top:8px;width:100%" onclick="translate()">✦ Traduire avec Claude IA</button>
+      <div id="tr-output" style="display:none;margin-top:10px;background:var(--bg3);border:1px solid var(--bd2);border-radius:8px;padding:12px;font-size:13px;color:var(--t);line-height:1.7"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MARKETPLACE ══ -->
+<div class="page" id="page-marketplace">
+  <div class="pg-scroll">
+    <div style="text-align:center;padding:20px 0 10px">
+      <div style="font-size:24px;margin-bottom:8px">◈</div>
+      <div style="font-size:18px;font-weight:800">Marketplace de modules</div>
+      <div style="font-size:12px;color:var(--t3);margin-top:4px">Étends les fonctionnalités de NathanFR3 Suite</div>
+    </div>
+    <div class="g3">
+      <div class="card" style="cursor:pointer"><div style="font-size:24px;margin-bottom:8px">🤖</div><div style="font-size:13px;font-weight:700">Discord Analytics</div><div style="font-size:11px;color:var(--t3);margin-top:4px">Statistiques avancées de tes serveurs</div><div style="margin-top:10px;display:flex;align-items:center;justify-content:space-between"><span class="bdg bdg-g">Gratuit</span><button class="btn btn-p btn-sm">Installer</button></div></div>
+      <div class="card" style="cursor:pointer"><div style="font-size:24px;margin-bottom:8px">🔒</div><div style="font-size:13px;font-weight:700">Security Pro</div><div style="font-size:11px;color:var(--t3);margin-top:4px">Protection avancée anti-DDoS</div><div style="margin-top:10px;display:flex;align-items:center;justify-content:space-between"><span class="bdg bdg-y">Premium</span><button class="btn btn-p btn-sm">Installer</button></div></div>
+      <div class="card" style="cursor:pointer"><div style="font-size:24px;margin-bottom:8px">📊</div><div style="font-size:13px;font-weight:700">Database Manager</div><div style="font-size:11px;color:var(--t3);margin-top:4px">Interface phpMyAdmin intégrée</div><div style="margin-top:10px;display:flex;align-items:center;justify-content:space-between"><span class="bdg bdg-g">Gratuit</span><button class="btn btn-p btn-sm">Installer</button></div></div>
+      <div class="card" style="cursor:pointer"><div style="font-size:24px;margin-bottom:8px">🎵</div><div style="font-size:13px;font-weight:700">Music Bot</div><div style="font-size:11px;color:var(--t3);margin-top:4px">Bot musique Discord intégré</div><div style="margin-top:10px;display:flex;align-items:center;justify-content:space-between"><span class="bdg bdg-g">Gratuit</span><button class="btn btn-p btn-sm">Installer</button></div></div>
+      <div class="card" style="cursor:pointer"><div style="font-size:24px;margin-bottom:8px">🌐</div><div style="font-size:13px;font-weight:700">Web Scraper</div><div style="font-size:11px;color:var(--t3);margin-top:4px">Scraping de données automatisé</div><div style="margin-top:10px;display:flex;align-items:center;justify-content:space-between"><span class="bdg bdg-b">Beta</span><button class="btn btn-p btn-sm">Installer</button></div></div>
+      <div class="card" style="cursor:pointer"><div style="font-size:24px;margin-bottom:8px">📱</div><div style="font-size:13px;font-weight:700">Mobile Sync</div><div style="font-size:11px;color:var(--t3);margin-top:4px">Synchronisation multi-appareils</div><div style="margin-top:10px;display:flex;align-items:center;justify-content:space-between"><span class="bdg bdg-y">Premium</span><button class="btn btn-p btn-sm">Installer</button></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SETTINGS ══ -->
+<div class="page" id="page-settings">
+  <div class="pg-scroll">
+    <div class="card">
+      <div class="card-ttl" style="margin-bottom:12px">Thème</div>
+      <div style="display:flex;gap:8px">
+        <div onclick="setTheme('dark')" style="width:60px;height:40px;background:#0b0d12;border:2px solid var(--acc);border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:10px;color:#fff">Sombre</div>
+        <div onclick="setTheme('blue')" style="width:60px;height:40px;background:#0a1628;border:1px solid var(--bd2);border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:10px;color:#93c5fd">Bleu</div>
+        <div onclick="setTheme('green')" style="width:60px;height:40px;background:#0a1a12;border:1px solid var(--bd2);border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:10px;color:#86efac">Vert</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-ttl" style="margin-bottom:12px">Compte</div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div><label style="font-size:11px;color:var(--t2);display:block;margin-bottom:4px">Nom d'utilisateur</label><input class="inp" style="width:100%" value="NathanFR3"/></div>
+        <div><label style="font-size:11px;color:var(--t2);display:block;margin-bottom:4px">Email</label><input class="inp" style="width:100%" value="nathan@example.com" type="email"/></div>
+        <button class="btn btn-p" style="width:fit-content">Sauvegarder</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-ttl" style="margin-bottom:12px">Préférences</div>
+      <div style="display:flex;flex-direction:column;gap:0">
+        <div class="rsb" style="padding:10px 0;border-bottom:1px solid var(--bd)"><div><div style="font-size:13px;font-weight:600">Notifications</div></div><div class="tog on" onclick="this.classList.toggle('on')"></div></div>
+        <div class="rsb" style="padding:10px 0;border-bottom:1px solid var(--bd)"><div><div style="font-size:13px;font-weight:600">Sync GitHub auto</div></div><div class="tog on" onclick="this.classList.toggle('on')"></div></div>
+        <div class="rsb" style="padding:10px 0"><div><div style="font-size:13px;font-weight:600">Mode sombre</div></div><div class="tog on" onclick="this.classList.toggle('on')"></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /main -->
+
+<div id="rp" class="off">
+  <div id="rp-hd">
+    <span style="font-size:13px">◈</span>
+    <span style="font-size:12px;font-weight:700;color:var(--t)">Bot Discord</span>
+    <span id="rp-bb" class="nav-bd nbd-r" style="display:none">0</span>
+    <div style="margin-left:auto;cursor:pointer;color:var(--t3);font-size:11px" onclick="rpToggle()">✕</div>
+  </div>
+  <div id="rp-bd">
+    <div id="rp-msg" style="text-align:center;padding:24px 12px;color:var(--t3);font-size:12px;line-height:1.6">
+      <div style="font-size:32px;margin-bottom:12px;opacity:.4">◈</div>
+      Entre ton <b style="color:var(--t)">Application ID</b> dans la page Bots ou Serveurs pour activer le bot.
+    </div>
+    <div id="rp-main" style="display:none;flex-direction:column;gap:10px">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <div class="rsc"><div class="rsc-l">Raids</div><div class="rsc-v" id="rp-v-raids">0</div></div>
+        <div class="rsc"><div class="rsc-l">Spam</div><div class="rsc-v" id="rp-v-spam">0</div></div>
+        <div class="rsc"><div class="rsc-l">Mutes</div><div class="rsc-v" id="rp-v-mutes">0</div></div>
+        <div class="rsc"><div class="rsc-l">Bans</div><div class="rsc-v" id="rp-v-bans" style="color:var(--acc5)">0</div></div>
+      </div>
+      <div class="card" style="padding:10px 12px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+          <span style="font-size:12px;font-weight:600;color:var(--t)">Logs temps réel</span>
+          <div style="display:flex;gap:3px">
+            <button class="btn btn-g btn-sm" style="padding:2px 6px;font-size:9px" onclick="rpFilt('all')">Tous</button>
+            <button class="btn btn-g btn-sm" style="padding:2px 6px;font-size:9px" onclick="rpFilt('raid')">Raids</button>
+            <button class="btn btn-d btn-sm" style="padding:2px 6px;font-size:9px" onclick="rpClr()">✕</button>
+          </div>
+        </div>
+        <div id="rp-logs" style="max-height:180px;overflow-y:auto"></div>
+      </div>
+      <div class="card" style="padding:10px 12px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+          <span style="font-size:12px;font-weight:600;color:var(--t)">Bans en attente</span>
+        </div>
+        <div id="rp-bans"><div style="font-size:11px;color:var(--t3);font-family:var(--mono);text-align:center;padding:8px">✓ Aucun ban</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+</div><!-- /body -->
+</div><!-- /app -->
+
+<script>
+// ════════════════════════════════════════
+//  NAVIGATION
+// ════════════════════════════════════════
+let sbOpen = true
+function goTo(id, navEl) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('on'))
+  document.getElementById('page-' + id)?.classList.add('on')
+  document.querySelectorAll('.nav').forEach(n => n.classList.remove('on'))
+  if (navEl) navEl.classList.add('on')
+  else document.querySelectorAll('.nav').forEach(n => { if (n.querySelector('.nav-lbl')?.textContent.toLowerCase().includes(id.replace('-',' '))) n.classList.add('on') })
+  document.getElementById('notif-panel')?.classList.remove('open')
+  if (id === 'terminal') setTimeout(() => document.getElementById('tinp')?.focus(), 100)
+  if (id === 'perf') rCores()
+  if (id === 'logs') rLogs()
+  if (id === 'github') rGhHistory()
+  if (id === 'files') rFiles()
+  if (id === 'passwords') { rPwds(); genPwd() }
+  if (id === 'prompts') rSavedPrompts()
+}
+function toggleSb() { sbOpen = !sbOpen; document.getElementById('sb').classList.toggle('closed', !sbOpen) }
+
+// ════════════════════════════════════════
+//  LIVE STATS
+// ════════════════════════════════════════
+let cpuV = 34, ramV = 61
+setInterval(() => {
+  cpuV = Math.max(5, Math.min(95, cpuV + (Math.random()-.5)*7))
+  ramV = Math.max(30, Math.min(90, ramV + (Math.random()-.5)*3))
+  const cpu = Math.round(cpuV), ram = Math.round(ramV)
+  const s = (id, v) => { const e = document.getElementById(id); if(e) e.textContent = v }
+  const w = (id, v) => { const e = document.getElementById(id); if(e) e.style.width = v + '%' }
+  s('cpu-v', cpu+'%'); w('cpu-b', cpu)
+  s('ram-v', ram+'%'); w('ram-b', ram)
+  s('perf-cpu', cpu+'%'); s('perf-ram', ram+'%'); s('task-cpu', cpu+'%')
+  s('mem-v', ram+'%'); w('mem-b', ram)
+  s('dash-msgs', (3000+Math.floor(Math.random()*500)).toLocaleString())
+  const nets=['↑ 0.8 MB/s','↑ 1.2 MB/s','↑ 2.1 MB/s','↑ 0.5 MB/s']; s('perf-net', nets[Math.floor(Math.random()*4)])
+  s('dash-speed', nets[Math.floor(Math.random()*4)])
+  const pts = Array.from({length:9},(_,i)=>`${i*32.5},${2+Math.random()*32}`).join(' ')
+  const sl = document.getElementById('spark-l'), sf = document.getElementById('spark-f')
+  if(sl){sl.setAttribute('points',pts);sf?.setAttribute('points',pts+' 260,36 0,36')}
+}, 2000)
+
+// ════════════════════════════════════════
+//  NOTIFICATIONS
+// ════════════════════════════════════════
+let notifs = [
+  {id:1,type:'nerr', icon:'⚠',msg:'Tentative de raid — 47 comptes suspects',time:'14:32',read:false},
+  {id:2,type:'nwarn',icon:'◈',msg:'Spam détecté — canal #général (zap8821)',time:'13:11',read:false},
+  {id:3,type:'nwarn',icon:'◎',msg:'Bot non autorisé — invitation bloquée',time:'09:04',read:false},
+  {id:4,type:'nok',  icon:'✓',msg:'Sauvegarde DB terminée avec succès',time:'03:00',read:true},
+  {id:5,type:'ninfo',icon:'ℹ',msg:'GitHub Pages déployé avec succès',time:'02:30',read:true},
+]
+function rNotifs() {
+  const list = document.getElementById('notif-list')
+  if(!list) return
+  list.innerHTML = notifs.slice(0,7).map(n=>`
+    <div class="nitem ${n.type}" onclick="markRead(${n.id})">
+      <span class="nicon">${n.icon}</span>
+      <div><div class="ntxt">${n.msg}</div><div class="ntime">${n.time}</div></div>
+    </div>`).join('')
+  const unread = notifs.filter(n=>!n.read).length
+  const bd = document.getElementById('nbdg')
+  if(bd){bd.textContent=unread;bd.style.display=unread?'flex':'none'}
+  const an = document.getElementById('alert-n'); if(an) an.textContent=unread
+}
+function toggleNotifs() { document.getElementById('notif-panel')?.classList.toggle('open'); rNotifs() }
+function markRead(id) { notifs = notifs.map(n=>n.id===id?{...n,read:true}:n); rNotifs() }
+function markAllRead() { notifs = notifs.map(n=>({...n,read:true})); rNotifs() }
+document.addEventListener('click', e => { if(!e.target.closest('.notif-wrap')) document.getElementById('notif-panel')?.classList.remove('open') })
+rNotifs()
+
+// ════════════════════════════════════════
+//  LOGS
+// ════════════════════════════════════════
+const LOG_POOL = [
+  {type:'ok',  msg:'Bot nathanfr3 connecté et actif'},
+  {type:'info',msg:'42 utilisateurs actifs en ligne'},
+  {type:'info',msg:'GitHub sync — push réussi sur main'},
+  {type:'warn',msg:'Rate limit atteint — IP 185.42.x.x'},
+  {type:'err', msg:'Tentative d\'accès non autorisée bloquée'},
+  {type:'ok',  msg:'Sauvegarde automatique complétée'},
+  {type:'info',msg:'GitHub Pages mis à jour — panel.html'},
+  {type:'warn',msg:'Mémoire cache > 80% — nettoyage lancé'},
+  {type:'ok',  msg:'Certificat SSL renouvelé'},
+  {type:'info',msg:'3 nouveaux membres vérifiés'},
+  {type:'err', msg:'Erreur webhook Discord — retry...'},
+  {type:'ok',  msg:'Anti-raid activé — verrou serveur'},
+]
+let allLogs = [], logIdx = 0, logFilter = 'all'
+function addLog() {
+  const e = LOG_POOL[logIdx % LOG_POOL.length]; logIdx++
+  const entry = {...e, time: new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit',second:'2-digit'})}
+  allLogs.unshift(entry); if(allLogs.length>150) allLogs.pop()
+  rLogs()
+  const dl = document.getElementById('dash-logs')
+  if(dl){const d=document.createElement('div');d.className='logr';const tc={ok:'var(--acc3)',info:'var(--acc2)',warn:'var(--acc4)',err:'var(--acc5)'}[entry.type];d.innerHTML=`<span class="logt">${entry.time}</span><span style="color:${tc};width:52px;flex-shrink:0">[${entry.type.toUpperCase()}]</span><span>${entry.msg}</span>`;dl.insertBefore(d,dl.firstChild);if(dl.children.length>6)dl.removeChild(dl.lastChild)}
+}
+function rLogs(f) {
+  if(f) logFilter=f
+  const box=document.getElementById('log-box'); if(!box) return
+  const shown=logFilter==='all'?allLogs:allLogs.filter(l=>l.type===logFilter)
+  const tc={ok:'var(--acc3)',info:'var(--acc2)',warn:'var(--acc4)',err:'var(--acc5)'}
+  box.innerHTML=shown.map(l=>`<div class="logr"><span class="logt">${l.time}</span><span style="color:${tc[l.type]||'var(--t2)'};width:52px;flex-shrink:0">[${l.type.toUpperCase()}]</span><span>${l.msg}</span></div>`).join('')
+  const lc=document.getElementById('log-count-lbl'); if(lc) lc.textContent=shown.length+' entrées'
+}
+function filterLog(f){rLogs(f)}
+for(let i=0;i<12;i++) addLog()
+setInterval(addLog, 3500)
+
+// ════════════════════════════════════════
+//  TERMINAL
+// ════════════════════════════════════════
+let tHist=[], tHIdx=-1
+const TCMDS = {
+  'ls':()=>'<span style="color:var(--acc3)">index.html</span>  <span style="color:var(--acc4)">panel.html</span>  <span style="color:var(--acc2)">watcher.js</span>  <span style="color:var(--acc4)">package.json</span>  <span style="color:var(--t3)">.gitignore</span>',
+  'pwd':()=>'<span class="tdim">/home/nathanfr3/apptest1</span>',
+  'whoami':()=>'<span class="tok">nathanfr3</span>',
+  'date':()=>`<span class="tdim">${new Date().toLocaleString('fr-FR')}</span>`,
+  'node -v':()=>'<span class="tok">v22.0.0</span>',
+  'npm -v':()=>'<span class="tok">10.5.0</span>',
+  'python3 --version':()=>'<span class="tok">Python 3.11.4</span>',
+  'git status':()=>'<span class="tok">On branch main</span><br><span class="twrn">modified: panel.html</span>',
+  'git push':()=>'<span class="tok">✓ Push → github.com/lolp4686-source/apptest1</span>',
+  'git log --oneline':()=>'<span class="twrn">a3f2c1b</span> feat: add Claude IA<br><span class="twrn">9d8e7f6</span> feat: add panel admin<br><span class="twrn">3b1a2c0</span> init: NathanFR3 Suite',
+  'git add .':()=>'<span class="tok">✓ Fichiers ajoutés au staging</span>',
+  'npm install':()=>'<span class="tdim">added 127 packages in 3.2s</span><br><span class="tok">✓ Installation terminée</span>',
+  'npm start':()=>'<span class="tok">✓ Serveur lancé sur http://localhost:3000</span>',
+  'npm run dev':()=>'<span class="twrn">[nodemon] starting node index.js</span><br><span class="tok">✓ Serveur : http://localhost:3000</span>',
+  'top':()=>'<span class="tinf">PID   CPU%  MEM    COMMAND</span><br><span class="tok">847   34.1  4.9G   node watcher.js</span><br><span class="twrn">1024  18.2  1.2G   mongod</span>',
+  'df -h':()=>'<span class="tdim">/dev/sda1  500G  210G  290G  42%</span>',
+  'free -h':()=>'<span class="tdim">Mem: 7.8G  used: 4.9G  free: 1.6G</span>',
+  'ping google.com':()=>'<span class="tok">64 bytes from 142.250.74.46: time=12ms</span><br><span class="tok">64 bytes: time=11ms</span><br><span class="tdim">2 transmitted, 2 received, 0% loss</span>',
+  'clear':()=>{document.getElementById('tout').innerHTML='';return null},
+  'help':()=>[
+    '<span class="thl">Système :</span> ls, pwd, whoami, date, top, df -h, free -h, ping google.com, clear',
+    '<span class="thl">Node/npm :</span> node -v, npm -v, npm install, npm start, npm run dev',
+    '<span class="thl">Python :</span> python3 --version',
+    '<span class="thl">Git :</span> git status, git add ., git push, git log --oneline',
+    '<span class="thl">Fichiers :</span> cat &lt;fichier&gt;, echo &lt;texte&gt;, mkdir, rm',
+  ].join('<br>'),
+}
+function tPrint(html){const o=document.getElementById('tout');if(!o)return;const d=document.createElement('div');d.className='tl';d.innerHTML=html;o.appendChild(d);o.scrollTop=o.scrollHeight}
+function tExec(raw){
+  const ps=document.getElementById('tps').textContent
+  tPrint(`<span class="tps">${ps}</span><span style="color:var(--t)">${raw}</span>`)
+  if(raw.startsWith('echo ')){tPrint(`<span class="tdim">${raw.slice(5)}</span>`);return}
+  if(raw.startsWith('cat ')){const fc={'panel.html':'&lt;!-- NathanFR3 Suite Panel --&gt;...','package.json':'{ "name": "nathanfr3-suite" }'};const f=raw.slice(4).trim();tPrint(fc[f]?`<span class="tdim">${fc[f]}</span>`:`<span class="terr">cat: ${f}: introuvable</span>`);return}
+  if(raw.startsWith('mkdir ')){tPrint(`<span class="tok">✓ Dossier créé : ${raw.slice(6)}</span>`);return}
+  if(raw.startsWith('rm ')){tPrint(`<span class="tok">✓ Supprimé : ${raw.slice(3)}</span>`);return}
+  if(raw.startsWith('cd ')){document.getElementById('tps').textContent=`~/${raw.slice(3)} $`;return}
+  if(raw.startsWith('git commit')){tPrint(`<span class="tok">[main ${Math.random().toString(36).slice(2,9)}] ${raw.match(/"([^"]+)"/)?.[1]||'update'}</span>`);return}
+  const h=TCMDS[raw];if(h){const r=h();if(r!==null&&r!==undefined)tPrint(`<span style="color:var(--t2)">${r}</span>`)}
+  else tPrint(`<span class="terr">commande introuvable: ${raw}</span> <span class="tdim">— 'help'</span>`)
+}
+function tKey(e){
+  const inp=e.target
+  if(e.key==='ArrowUp'){e.preventDefault();if(tHIdx<tHist.length-1){tHIdx++;inp.value=tHist[tHist.length-1-tHIdx]};return}
+  if(e.key==='ArrowDown'){e.preventDefault();if(tHIdx>0){tHIdx--;inp.value=tHist[tHist.length-1-tHIdx]}else{tHIdx=-1;inp.value=''};return}
+  if(e.key==='Tab'){e.preventDefault();tAutocomp(inp);return}
+  if(e.key!=='Enter') return
+  const cmd=inp.value.trim();inp.value='';tHideSug()
+  if(!cmd)return;tHist.push(cmd);tHIdx=-1;tExec(cmd)
+}
+function tSug(v){const w=document.getElementById('tsug');if(!v){tHideSug();return};const m=Object.keys(TCMDS).filter(c=>c.startsWith(v)&&c!==v).slice(0,7);if(!m.length){tHideSug();return};w.style.display='flex';w.innerHTML=m.map(c=>`<div class="tsug-item" onclick="useTSug('${c}')"><b>${c.slice(0,v.length)}</b>${c.slice(v.length)}</div>`).join('')}
+function useTSug(c){document.getElementById('tinp').value=c;tHideSug();document.getElementById('tinp').focus()}
+function tHideSug(){document.getElementById('tsug').style.display='none'}
+function tAutocomp(inp){const m=Object.keys(TCMDS).filter(c=>c.startsWith(inp.value));if(m.length===1)inp.value=m[0];else tSug(inp.value)}
+function tClear(){document.getElementById('tout').innerHTML=''}
+function tSwitch(el,shell){document.querySelectorAll('.ttab').forEach(t=>t.classList.remove('on'));el.classList.add('on');document.getElementById('tps').textContent={bash:'~/apptest1 $',node:'node >',git:'git:main $'}[shell]||'$ ';tClear();tPrint(`<span class="tok">Shell : ${shell}</span>`)}
+function tAdd(){const n='bash-'+(document.querySelectorAll('.ttab').length-1);const plus=document.getElementById('ttabs').lastElementChild;const t=document.createElement('div');t.className='ttab';t.textContent=n;t.onclick=function(){tSwitch(this,'bash')};document.getElementById('ttabs').insertBefore(t,plus);tSwitch(t,'bash')}
+
+// INIT TERMINAL
+tPrint('<span class="tok" style="font-weight:700">NathanFR3 Suite — Terminal Pro v1.0</span>')
+tPrint('<span class="tdim">Tab = autocomplétion · ↑↓ = historique · <span style="color:var(--acc6)">help</span> = liste</span>')
+tPrint('<span class="tdim">──────────────────────────────────────────</span>')
+
+// ════════════════════════════════════════
+//  EDITOR
+// ════════════════════════════════════════
+const EFILES = {
+  'main.js':{l:'js',c:'#f7df1e',v:`// NathanFR3 Suite — Bot Discord\nconst { Client, GatewayIntentBits, SlashCommandBuilder } = require('discord.js');\nconst client = new Client({\n  intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages]\n});\n\nclient.once('ready', () => {\n  console.log(\`✓ Bot \${client.user.tag} connecté\`);\n  client.user.setActivity('NathanFR3 Suite | En ligne');\n});\n\nclient.on('messageCreate', msg => {\n  if (msg.content === '!ping') {\n    msg.reply(\`🏓 Pong! Latence: \${client.ws.ping}ms\`);\n  }\n});\n\nclient.login(process.env.DISCORD_TOKEN);`},
+  'panel.html':{l:'html',c:'#e34c26',v:'<!-- NathanFR3 Suite Panel -->\n<!-- Ouvre panel.html dans ton navigateur -->\n<!-- Ou : lolp4686-source.github.io/apptest1/panel.html -->'},
+  'config.json':{l:'json',c:'#cbcb41',v:`{\n  "name": "nathanfr3-suite",\n  "version": "1.0.0",\n  "description": "Super Application Discord + IA + Dev",\n  "scripts": {\n    "start": "node main.js",\n    "dev": "nodemon main.js"\n  },\n  "dependencies": {\n    "discord.js": "^14.14.1",\n    "@anthropic-ai/sdk": "^0.24.0",\n    "express": "^4.18.2",\n    "mongoose": "^8.4.0",\n    "dotenv": "^16.4.5"\n  }\n}`},
+}
+const ELANGS = {js:'JavaScript',html:'HTML',css:'CSS',py:'Python',json:'JSON',md:'Markdown'}
+let ecf='main.js', etabs=['main.js'], emod=new Set()
+
+function eHl(s,l){
+  let h=s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+  if(l==='js'){h=h.replace(/(\/\/[^\n]*)/g,'<span style="color:#6a9955">$1</span>');h=h.replace(/(`[^`]*`|"[^"]*"|'[^']*')/g,'<span style="color:#ce9178">$1</span>');h=h.replace(/\b(const|let|var|function|return|if|else|for|while|class|new|import|export|default|async|await|require|null|undefined|true|false|this|of|in|try|catch|throw)\b/g,'<span style="color:var(--acc)">$1</span>');h=h.replace(/\b(\d+)\b/g,'<span style="color:var(--acc3)">$1</span>')}
+  else if(l==='html'){h=h.replace(/(&lt;!--[\s\S]*?--&gt;)/g,'<span style="color:#6a9955">$1</span>');h=h.replace(/(&lt;\/?)([\w-]+)/g,'$1<span style="color:var(--acc)">$2</span>');h=h.replace(/("(?:[^"]*)")/g,'<span style="color:#ce9178">$1</span>')}
+  else if(l==='json'){h=h.replace(/"([^"\\]*)"\s*:/g,'<span style="color:var(--acc2)">"$1"</span>:');h=h.replace(/:\s*"([^"\\]*)"/g,': <span style="color:#ce9178">"$1"</span>');h=h.replace(/\b(true|false|null)\b/g,'<span style="color:var(--acc)">$1</span>');h=h.replace(/\b(\d+)\b/g,'<span style="color:var(--acc3)">$1</span>')}
+  return h
+}
+
+function eRender(){
+  if(!ecf||!EFILES[ecf])return
+  const fd=EFILES[ecf],ed=document.getElementById('ecode')
+  if(!ed)return
+  const sel=window.getSelection();let off=0
+  if(sel.rangeCount){try{const r=document.createRange();r.selectNodeContents(ed);r.setEnd(sel.getRangeAt(0).startContainer,sel.getRangeAt(0).startOffset);off=r.toString().length}catch(e){}}
+  ed.innerHTML=eHl(fd.v,fd.l)
+  document.getElementById('eln').innerHTML=fd.v.split('\n').map((_,i)=>`<div class="eln-n">${i+1}</div>`).join('')
+  document.getElementById('esb-lang').textContent=ELANGS[fd.l]||fd.l
+  try{const w=document.createTreeWalker(ed,NodeFilter.SHOW_TEXT);let n,c=0;while((n=w.nextNode())){if(c+n.length>=off){const r=document.createRange();r.setStart(n,Math.min(off-c,n.length));r.collapse(true);sel.removeAllRanges();sel.addRange(r);break}c+=n.length}}catch(e){}
+}
+
+function eRTabs(){
+  const bar=document.getElementById('etabs');if(!bar)return
+  bar.innerHTML=etabs.map(f=>{const fd=EFILES[f]||{};return`<div class="etab${f===ecf?' on':''}${emod.has(f)?' m':''}" onclick="eSwitch('${f}')"><div style="width:7px;height:7px;border-radius:2px;background:${fd.c||'#888'};flex-shrink:0"></div>${f}${emod.has(f)?'<span style="color:var(--t3);font-size:9px;margin-left:2px">●</span>':''}<span class="etab-x" onclick="eCT(event,'${f}')">&#215;</span></div>`}).join('')
+}
+
+function eSwitch(f){ecf=f;eRTabs();eRender();eUTree()}
+function eOpenFile(f){if(!etabs.includes(f))etabs.push(f);ecf=f;eRTabs();eRender();eUTree()}
+function eCT(e,f){e.stopPropagation();etabs=etabs.filter(t=>t!==f);if(ecf===f)ecf=etabs[etabs.length-1]||'';eRTabs();if(ecf)eRender();eUTree()}
+function eUTree(){}
+function eInput(){if(!ecf)return;EFILES[ecf].v=document.getElementById('ecode').innerText;emod.add(ecf);eRender();eRTabs();eSV('● Modifié','var(--acc4)');ePos()}
+function eKey(e){if(e.key==='Tab'){e.preventDefault();document.execCommand('insertText',false,'  ')}if((e.ctrlKey||e.metaKey)&&e.key==='s'){e.preventDefault();eSave()}setTimeout(ePos,0)}
+function ePos(){try{const sel=window.getSelection();if(!sel.rangeCount)return;const r=document.createRange();r.selectNodeContents(document.getElementById('ecode'));r.setEnd(sel.getRangeAt(0).startContainer,sel.getRangeAt(0).startOffset);const t=r.toString().split('\n');document.getElementById('esb-pos').textContent=`Ln ${t.length}, Col ${t[t.length-1].length+1}`}catch(e){}}
+function eIns(t){document.getElementById('ecode')?.focus();document.execCommand('insertText',false,t)}
+function eSV(t,c){const e=document.getElementById('esb-sv');if(e){e.textContent=t;e.style.color=c}}
+function eSave(){emod.delete(ecf);eRTabs();eSV('✓ Sauvegardé','rgba(16,185,129,.7)')}
+function eAI(p){goTo('ai',null);document.getElementById('ai-ta').value=p;setTimeout(aiSend,200)}
+
+// ════════════════════════════════════════
+//  GITHUB
+// ════════════════════════════════════════
+const GH_HISTORY = [
+  {hash:'a3f2c1b',msg:'feat: add NathanFR3 Suite complète',time:'maintenant'},
+  {hash:'9d8e7f6',msg:'feat: add Claude IA + panel',time:'il y a 2h'},
+  {hash:'3b1a2c0',msg:'init: NathanCode project',time:'il y a 1j'},
+]
+function rGhHistory(){
+  const el=document.getElementById('gh-history');if(!el)return
+  el.innerHTML=GH_HISTORY.map(c=>`<div style="display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid var(--bd)"><span style="color:var(--acc4)">${c.hash}</span><span style="flex:1;color:var(--t2)">${c.msg}</span><span style="color:var(--t3)">${c.time}</span></div>`).join('')
+}
+function ghPush(){
+  const msg=document.getElementById('gh-msg')?.value||'auto: update'
+  const st=document.getElementById('gh-status');if(st){st.style.color='var(--acc4)';st.textContent='↑ Push en cours...'}
+  setTimeout(()=>{
+    GH_HISTORY.unshift({hash:Math.random().toString(36).slice(2,9),msg,time:'maintenant'})
+    rGhHistory()
+    document.getElementById('gh-lastpush').textContent=new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})
+    const n=document.getElementById('gh-commits');if(n)n.textContent=GH_HISTORY.length
+    if(st){st.style.color='var(--acc3)';st.textContent='✓ Push réussi → github.com/lolp4686-source/apptest1'}
+    if(document.getElementById('gh-msg'))document.getElementById('gh-msg').value=''
+    setTimeout(()=>{if(st)st.textContent=''},4000)
+  },1200)
+}
+
+// ════════════════════════════════════════
+//  PERFORMANCE CORES
+// ════════════════════════════════════════
+function rCores(){
+  const el=document.getElementById('cores');if(!el)return
+  const v=[Math.round(cpuV*.8),Math.round(cpuV*1.2),Math.round(cpuV*.5),Math.round(cpuV*1.4)].map(x=>Math.min(95,x))
+  el.innerHTML=v.map((x,i)=>`<div><div class="rsb" style="margin-bottom:3px;font-size:12px"><span style="color:var(--t2)">Core ${i+1}</span><span style="font-family:var(--mono);color:var(--t2)">${x}%</span></div><div class="prog"><div class="prog-f" style="width:${x}%;background:var(--acc)"></div></div></div>`).join('')
+}
+
+// ════════════════════════════════════════
+//  FILES
+// ════════════════════════════════════════
+const FILE_DATA = [
+  {name:'panel.html',ext:'HTML',color:'#e34c26',size:'56 KB',mod:'maintenant'},
+  {name:'index.html',ext:'HTML',color:'#e34c26',size:'51 KB',mod:'il y a 2h'},
+  {name:'watcher.js',ext:'JS',color:'#f7df1e',size:'7.1 KB',mod:'il y a 1h'},
+  {name:'package.json',ext:'JSON',color:'#cbcb41',size:'926 B',mod:'il y a 3h'},
+  {name:'README.md',ext:'MD',color:'#83a598',size:'2.1 KB',mod:'il y a 1j'},
+  {name:'.github/',ext:'DIR',color:'#94a3b8',size:'—',mod:'il y a 1j'},
+]
+function rFiles(){
+  const el=document.getElementById('file-list');if(!el)return
+  el.innerHTML=FILE_DATA.map(f=>`<div class="file-item"><div class="file-ext" style="background:${f.color}18;color:${f.color};border:1px solid ${f.color}33">${f.ext}</div><span style="flex:1;font-size:12px;color:var(--t)">${f.name}</span><span style="font-family:var(--mono);font-size:11px;color:var(--t3)">${f.size}</span><span style="font-family:var(--mono);font-size:11px;color:var(--t3);margin-left:12px">${f.mod}</span><button class="btn btn-g btn-sm" style="margin-left:8px">Éditer</button></div>`).join('')
+}
+
+// ════════════════════════════════════════
+//  TASKS
+// ════════════════════════════════════════
+function refreshTasks(){document.getElementById('task-cpu').textContent=Math.round(cpuV)+'%'}
+
+// ════════════════════════════════════════
+//  NOTES
+// ════════════════════════════════════════
+const savedNote = localStorage.getItem('nf3_note')||'<h2>Ma note</h2><p>Commence à écrire ici...</p>'
+document.getElementById('notes-editor').innerHTML = savedNote
+function saveNote(){localStorage.setItem('nf3_note',document.getElementById('notes-editor').innerHTML);alert('Note sauvegardée !')}
+function clearNote(){document.getElementById('notes-editor').innerHTML='';localStorage.removeItem('nf3_note')}
+function exportNote(){window.print()}
+
+// ════════════════════════════════════════
+//  CALCULATOR
+// ════════════════════════════════════════
+let calcExpr=''
+function calcKey(k){calcExpr+=k;document.getElementById('calc-expr').textContent=calcExpr}
+function calcClear(){calcExpr='';document.getElementById('calc-expr').textContent='';document.getElementById('calc-result').textContent='0'}
+function calcDel(){calcExpr=calcExpr.slice(0,-1);document.getElementById('calc-expr').textContent=calcExpr}
+function calcEval(){try{const r=Function('"use strict";return ('+calcExpr.replace(/sin/g,'Math.sin').replace(/cos/g,'Math.cos').replace(/tan/g,'Math.tan')+')')();document.getElementById('calc-result').textContent=Number(r.toFixed(10)).toString();calcExpr=r.toString()}catch(e){document.getElementById('calc-result').textContent='Erreur';calcExpr=''}}
+
+// ════════════════════════════════════════
+//  PASSWORDS
+// ════════════════════════════════════════
+let pwds = JSON.parse(localStorage.getItem('nf3_pwds')||'[]')
+if(!pwds.length) pwds=[{site:'GitHub',user:'lolp4686-source',pwd:'••••••••••••'},
+  {site:'Discord',user:'NathanFR3#0001',pwd:'••••••••••••'},
+  {site:'Anthropic',user:'nathan@example.com',pwd:'••••••••••••'}]
+function rPwds(){
+  const el=document.getElementById('pwd-list');if(!el)return
+  const colors=['#6366f1','#06b6d4','#10b981','#f59e0b','#ec4899']
+  el.innerHTML=pwds.map((p,i)=>`<div class="pwd-item">
+    <div class="pwd-ico" style="background:${colors[i%5]}18;border:1px solid ${colors[i%5]}33">${p.site[0]}</div>
+    <div style="flex:1"><div style="font-size:12px;font-weight:600;color:var(--t)">${p.site}</div><div style="font-size:11px;color:var(--t3)">${p.user}</div></div>
+    <span class="pwd-val" id="pw-${i}">${p.pwd}</span>
+    <button class="btn btn-g btn-sm" onclick="showPwd(${i})">👁</button>
+    <button class="btn btn-d btn-sm" onclick="delPwd(${i})">✕</button>
+  </div>`).join('')
+}
+function showPwd(i){const el=document.getElementById('pw-'+i);el.classList.toggle('show');el.textContent=el.classList.contains('show')?pwds[i].pwd:'••••••••••••'}
+function delPwd(i){pwds.splice(i,1);localStorage.setItem('nf3_pwds',JSON.stringify(pwds));rPwds()}
+function addPwd(){const s=prompt('Site :');if(!s)return;const u=prompt('Utilisateur :');const p=prompt('Mot de passe :');if(s&&u&&p){pwds.push({site:s,user:u,pwd:p});localStorage.setItem('nf3_pwds',JSON.stringify(pwds));rPwds()}}
+function genPwd(){
+  const len=parseInt(document.getElementById('pwd-len')?.value||16)
+  document.getElementById('pwd-len-v').textContent=len
+  const chars='abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+-=[]{}|;:,.<>?'
+  let pwd=''; for(let i=0;i<len;i++) pwd+=chars[Math.floor(Math.random()*chars.length)]
+  document.getElementById('pwd-gen').textContent=pwd
+}
+function copyPwd(){navigator.clipboard?.writeText(document.getElementById('pwd-gen').textContent).then(()=>alert('Copié !'))}
+
+// ════════════════════════════════════════
+//  SECURITY SCAN
+// ════════════════════════════════════════
+let scanning=false
+function startScan(){
+  if(scanning)return;scanning=true
+  const st=document.getElementById('scan-status'),fill=document.getElementById('scan-fill')
+  const steps=['Analyse des processus...','Scan des ports réseau...','Vérification des fichiers système...','Analyse des connexions Discord...','Vérification des signatures...']
+  let i=0,prog=0
+  const iv=setInterval(()=>{
+    prog+=20;fill.style.width=prog+'%'
+    st.textContent=steps[i++]||'Analyse terminée'
+    if(prog>=100){clearInterval(iv);st.textContent='✓ Analyse complète — 0 menaces détectées';scanning=false}
+  },600)
+}
+
+// ════════════════════════════════════════
+//  TRANSLATOR
+// ════════════════════════════════════════
+let aiKeyVal = localStorage.getItem('nf3_ai_key')||''
+async function translate(){
+  const text=document.getElementById('tr-input')?.value?.trim()
+  if(!text)return
+  const from=document.getElementById('tr-from')?.value
+  const to=document.getElementById('tr-to')?.value
+  const out=document.getElementById('tr-output')
+  if(!aiKeyVal){out.style.display='block';out.textContent='⚠ Configure ta clé API Claude dans le module IA pour utiliser le traducteur.';return}
+  out.style.display='block';out.textContent='✦ Traduction en cours...'
+  try{
+    const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':aiKeyVal,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:500,messages:[{role:'user',content:`Traduis ce texte ${from!=='auto'?'de '+from:''} vers ${to}. Réponds UNIQUEMENT avec la traduction, sans explications:\n\n${text}`}]})})
+    const d=await r.json()
+    out.textContent=d.content?.[0]?.text||'Erreur de traduction'
+  }catch(e){out.textContent='⚠ Erreur : '+e.message}
+}
+
+// ════════════════════════════════════════
+//  PROMPT GENERATOR
+// ════════════════════════════════════════
+let savedPromptsData=JSON.parse(localStorage.getItem('nf3_prompts')||'[]')
+function genPrompt(){
+  const domain=document.getElementById('prompt-domain')?.value
+  const task=document.getElementById('prompt-task')?.value||'créer un système complet'
+  const detail=document.getElementById('prompt-detail')?.value
+  const level={'Débutant (simple et clair)':'simple et facile à comprendre, avec des explications claires','Intermédiaire (avec explications)':'détaillé avec des exemples de code commentés','Expert (technique avancé)':'très technique et avancé, avec les meilleures pratiques et optimisations'}[detail]||'détaillé'
+  const prompt=`Tu es un expert en ${domain}. Ta mission est de ${task}.\n\nContraintes :\n- Le code doit être ${level}\n- Utilise les meilleures pratiques actuelles de ${domain}\n- Ajoute de la gestion d'erreurs appropriée\n- Commente le code en français\n- Fournis un exemple d'utilisation complet\n\nRéponds avec :\n1. Une explication de l'approche\n2. Le code complet et fonctionnel\n3. Un exemple d'utilisation\n4. Les étapes d'installation si nécessaire`
+  document.getElementById('prompt-txt').textContent=prompt
+  document.getElementById('prompt-result').style.display='block'
+}
+function copyPrompt(){navigator.clipboard?.writeText(document.getElementById('prompt-txt')?.textContent||'').then(()=>{const txt=document.getElementById('prompt-txt');const orig=document.getElementById('prompt-txt').textContent;const msg='✓ Copié !';if(txt)txt.textContent=msg;setTimeout(()=>{if(txt)txt.textContent=orig},1500)})}
+function rSavedPrompts(){const el=document.getElementById('saved-prompts');if(!el)return;el.innerHTML=savedPromptsData.length?savedPromptsData.map((p,i)=>`<div style="background:var(--bg3);border-radius:8px;padding:10px;border:1px solid var(--bd)"><div style="font-size:11px;color:var(--t2);font-family:var(--mono)">${p.domain}</div><div style="font-size:12px;color:var(--t);margin-top:3px">${p.task}</div></div>`).join(''):'<div style="font-size:12px;color:var(--t3);text-align:center;padding:16px">Aucun prompt sauvegardé</div>'}
+
+// ════════════════════════════════════════
+//  CLAUDE IA
+// ════════════════════════════════════════
+let aiBusy=false
+let aiMemory=JSON.parse(localStorage.getItem('nf3_memory')||'[]')
+function aiSaveKey(){
+  const v=document.getElementById('ai-key')?.value?.trim()
+  if(!v||v.includes('•'))return
+  if(!v.startsWith('sk-ant-')){document.getElementById('ai-kst').textContent='✗ Clé invalide — doit commencer par sk-ant-';document.getElementById('ai-kst').style.color='var(--acc5)';return}
+  aiKeyVal=v;localStorage.setItem('nf3_ai_key',v)
+  document.getElementById('ai-key').value='••••••••••••••••'
+  document.getElementById('ai-kst').textContent='✓ Clé API active et sauvegardée'
+  document.getElementById('ai-kst').style.color='var(--acc3)'
+}
+function aiAddMsg(role,html){
+  const msgs=document.getElementById('ai-messages');if(!msgs)return
+  const w=document.createElement('div');w.style.display='flex';w.style.flexDirection='column';w.style.gap='3px';w.style.maxWidth='92%'
+  if(role==='user')w.style.alignSelf='flex-end'
+  const t=new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})
+  w.innerHTML=`<div class="ai-msg ${role==='user'?'u':'b'}">${html}</div><span class="ai-mt">${t}</span>`
+  msgs.appendChild(w);msgs.scrollTop=msgs.scrollHeight
+}
+function aiFmt(txt){return txt.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/```(\w*)\n?([\s\S]*?)```/g,(_,l,c)=>`<pre>${c.trim()}</pre>`).replace(/`([^`]+)`/g,'<code>$1</code>').replace(/\*\*([^*]+)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>')}
+async function aiSend(){
+  const ta=document.getElementById('ai-ta')
+  const msg=ta?.value?.trim()
+  if(!msg||aiBusy)return
+  if(!aiKeyVal){aiAddMsg('assistant','⚠ Entre ta clé API Anthropic ci-dessus pour utiliser Claude IA.');return}
+  ta.value='';ta.style.height='auto'
+  aiAddMsg('user',msg.replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>'))
+  aiBusy=true;const btn=document.getElementById('ai-sendbtn');if(btn)btn.disabled=true
+  const msgs=document.getElementById('ai-messages')
+  const tp=document.createElement('div');tp.id='ai-tp';tp.innerHTML='<div class="ai-typing"><span></span><span></span><span></span></div>';msgs.appendChild(tp);msgs.scrollTop=msgs.scrollHeight
+
+  // Contexte éditeur + mémoire
+  const codeCtx=ecf&&EFILES[ecf]?`\nFichier actuel (${ecf}) :\n\`\`\`\n${EFILES[ecf].v.slice(0,2000)}\n\`\`\``:''
+  const memCtx=aiMemory.length?`\nMémoire sauvegardée :\n${aiMemory.map(m=>`- ${m}`).join('\n')}`:''
+
+  // Détecter si l'utilisateur veut sauvegarder quelque chose
+  if(msg.toLowerCase().includes('souviens')||msg.toLowerCase().includes('retiens')||msg.toLowerCase().includes('mémorise')){
+    aiMemory.push(msg);if(aiMemory.length>20)aiMemory.shift()
+    localStorage.setItem('nf3_memory',JSON.stringify(aiMemory))
+    document.getElementById('ai-mem-n').textContent=aiMemory.length
+  }
+
+  try{
+    const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':aiKeyVal,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1024,system:`Tu es Claude, l'assistant IA de NathanFR3 Suite. Tu es expert en développement, Discord.js, cybersécurité et IA. Tu réponds en français, de manière concise et précise. Tu utilises des blocs \`\`\` pour le code.${memCtx}${codeCtx}`,messages:[{role:'user',content:msg}]})})
+    const d=await r.json()
+    document.getElementById('ai-tp')?.remove()
+    if(d.error)aiAddMsg('assistant',`⚠ Erreur API : ${d.error.message}`)
+    else aiAddMsg('assistant',aiFmt(d.content?.[0]?.text||'Pas de réponse.'))
+  }catch(e){document.getElementById('ai-tp')?.remove();aiAddMsg('assistant',`⚠ Erreur : <code>${e.message}</code>`)}
+  aiBusy=false;if(btn)btn.disabled=false
+}
+function aiAsk(p){goTo('ai',null);if(document.getElementById('ai-ta'))document.getElementById('ai-ta').value=p;setTimeout(aiSend,200)}
+
+// Restore key
+if(aiKeyVal){const kst=document.getElementById('ai-kst');if(kst){kst.textContent='✓ Clé API configurée';kst.style.color='var(--acc3)'}document.getElementById('ai-mem-n').textContent=aiMemory.length}
+document.getElementById('ai-key').value=aiKeyVal?'••••••••••••••••':''
+
+// ════════════════════════════════════════
+//  SETTINGS - THEMES
+// ════════════════════════════════════════
+function setTheme(t){
+  const themes={dark:{bg:'#0b0d12',bg2:'#111520',acc:'#6366f1'},blue:{bg:'#0a1628',bg2:'#0d1e36',acc:'#3b82f6'},green:{bg:'#0a1a12',bg2:'#0d2018',acc:'#22c55e'}}
+  const th=themes[t]||themes.dark
+  document.documentElement.style.setProperty('--bg',th.bg)
+  document.documentElement.style.setProperty('--bg2',th.bg2)
+  document.documentElement.style.setProperty('--bg3',th.bg)
+  document.documentElement.style.setProperty('--acc',th.acc)
+}
+
+// ════════════════════════════════════════
+//  INIT
+// ════════════════════════════════════════
+eRTabs();eRender()
+rFiles()
+genPwd()
+document.getElementById('ai-mem-n').textContent=aiMemory.length
+
+// ══ PANNEAU DROIT BOT ══
+let rpOpen=false,rpLogs=[],rpFilt_='all',rpPending=[],rpSim=false,rpEi=0
+const RPE=[['ok','Bot connecté — protection active'],['info','Nouveau membre — OK'],['warn','Compte suspect (score:70)'],['security','Scam détecté: free nitro'],['ok','Mute 5min appliqué'],['raid','Tentative raid — bloquée'],['warn','Spam supprimé'],['ok','Anti-Raid actif'],['info','3 membres vérifiés'],['ok','GitHub sync → main']]
+let rpStats={raids:0,spam:0,mutes:0,bans:0}
+
+function rpToggle(){
+  rpOpen=!rpOpen
+  document.getElementById('rp').classList.toggle('off',!rpOpen)
+  if(rpOpen){const d=document.getElementById('rp-dot');if(d)d.style.display='none'}
+}
+
+function rpOn(id){
+  rpOpen=true
+  const p=document.getElementById('rp');if(p)p.classList.remove('off')
+  const msg=document.getElementById('rp-msg');if(msg)msg.style.display='none'
+  const main=document.getElementById('rp-main');if(main)main.style.display='flex'
+  rpLog('ok','Bot connecté — ID: '+id)
+  rpLog('info','Anti-Raid + Anti-Spam actifs')
+  rpLog('info','Protection HIGH activée')
+  if(!rpSim)rpStartSim()
+}
+
+function rpLog(type,msg){
+  const t=new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit',second:'2-digit'})
+  rpLogs.unshift({type,msg,t})
+  if(rpLogs.length>200)rpLogs.pop()
+  rpRLogs()
+  if(!rpOpen){const d=document.getElementById('rp-dot');if(d)d.style.display='block'}
+}
+
+function rpRLogs(){
+  const b=document.getElementById('rp-logs');if(!b)return
+  const col={ok:'#22d3a5',info:'#60a5fa',warn:'#fbbf24',err:'#f87171',security:'#c77dff',raid:'#f87171'}
+  const shown=rpFilt_==='all'?rpLogs:rpLogs.filter(l=>l.type===rpFilt_)
+  b.innerHTML=shown.slice(0,60).map(l=>`<div class="rlog"><span class="rlog-t">${l.t.slice(-5)}</span><span style="color:${col[l.type]||'#94a3b8'};flex-shrink:0;width:44px;font-size:9px">[${l.type.slice(0,4).toUpperCase()}]</span><span>${l.msg}</span></div>`).join('')
+}
+
+function rpFilt(f){rpFilt_=f;rpRLogs()}
+function rpClr(){rpLogs=[];rpRLogs()}
+
+function rpUpStats(){
+  const s=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v}
+  s('rp-v-raids',rpStats.raids);s('rp-v-spam',rpStats.spam);s('rp-v-mutes',rpStats.mutes);s('rp-v-bans',rpPending.length)
+  const bb=document.getElementById('rp-bb');if(bb){bb.textContent=rpPending.length;bb.style.display=rpPending.length?'inline-flex':'none'}
+}
+
+function rpRBans(){
+  const b=document.getElementById('rp-bans');if(!b)return
+  if(!rpPending.length){b.innerHTML='<div style="font-size:11px;color:var(--t3);font-family:var(--mono);text-align:center;padding:8px">✓ Aucun ban</div>';return}
+  b.innerHTML=rpPending.map((x,i)=>`<div class="rban"><div class="rban-av">${x.u[0].toUpperCase()}</div><div style="flex:1;min-width:0"><div style="font-size:11px;font-weight:600;color:var(--t)">${x.u}</div><div style="font-size:10px;color:var(--t2)">${x.r}</div><div style="display:flex;gap:3px;margin-top:3px"><button class="btn btn-d btn-sm" style="padding:2px 6px;font-size:9px" onclick="rpCB(${i})">✓ Ban</button><button class="btn btn-g btn-sm" style="padding:2px 6px;font-size:9px" onclick="rpRB(${i})">✗</button></div></div></div>`).join('')
+}
+
+function rpCB(i){const x=rpPending[i];rpPending.splice(i,1);rpStats.bans++;rpLog('security','BAN: '+x.u);rpRBans();rpUpStats()}
+function rpRB(i){const x=rpPending[i];rpPending.splice(i,1);rpLog('info','Rejeté: '+x.u);rpRBans();rpUpStats()}
+
+function rpStartSim(){
+  rpSim=true
+  setInterval(()=>{
+    const[t,m]=RPE[rpEi%RPE.length];rpEi++
+    rpLog(t,m)
+    if(t==='raid'){rpStats.raids++;rpStats.spam++}
+    if(t==='security')rpStats.spam++
+    if(t==='warn'&&m.includes('Spam'))rpStats.spam++
+    if(Math.random()<0.12)rpPending.unshift({u:'user'+Math.floor(Math.random()*9999),r:['Spam','Scam','Bot suspect'][Math.floor(Math.random()*3)]})
+    rpRBans();rpUpStats()
+  },5000)
+}
+
+function rpConnectBot(){
+  const inp = document.getElementById('rp-bot-id-inp')
+  if(!inp) return
+  const id = inp.value.trim()
+  if(!id || !/^\d{17,20}$/.test(id)){
+    alert('ID invalide — va sur discord.com/developers/applications\nCopie l\'Application ID (17 à 20 chiffres)')
+    return
+  }
+  localStorage.setItem('nf3_bot_id', id)
+  rpOn(id)
+}
+
+// ══ END PANNEAU DROIT ══
+// Ouvrir le panneau droit automatiquement au chargement
+window.addEventListener('load', function(){
+  // Toujours ouvrir le panneau droit
+  rpToggle()
+  const savedId = localStorage.getItem('nf3_bot_id')
+  if(savedId) {
+    setTimeout(()=>rpOn(savedId), 300)
+  } else {
+    rpLog('info','Entre ton Application ID dans la section Bots')
+  }
+})
+
+</script>
+</body>
+</html>
