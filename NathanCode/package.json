@@ -1,0 +1,35 @@
+{
+  "name": "nathancode",
+  "version": "1.0.0",
+  "description": "NathanCode — Éditeur de code style VSCode",
+  "main": "electron.js",
+  "scripts": {
+    "start":       "open index.html",
+    "electron":    "electron .",
+    "build-win":   "electron-builder --win",
+    "build-mac":   "electron-builder --mac",
+    "build-linux": "electron-builder --linux"
+  },
+  "devDependencies": {
+    "electron":         "^31.0.0",
+    "electron-builder": "^24.13.0"
+  },
+  "build": {
+    "appId":       "com.nathanfr3.nathancode",
+    "productName": "NathanCode",
+    "directories": { "output": "dist" },
+    "files":       ["index.html", "electron.js", "assets/**"],
+    "win": {
+      "target": "nsis",
+      "icon":   "assets/icon.ico"
+    },
+    "mac": {
+      "target": "dmg",
+      "icon":   "assets/icon.icns"
+    },
+    "linux": {
+      "target": "AppImage",
+      "icon":   "assets/icon.png"
+    }
+  }
+}

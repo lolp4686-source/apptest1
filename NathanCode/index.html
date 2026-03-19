@@ -1,0 +1,1134 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>NathanCode — Éditeur</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#1e1e1e;--bg2:#252526;--bg3:#2d2d30;--bg4:#3c3c3c;--bg5:#1a1a1a;
+  --accent:#569cd6;--green:#4ec9b0;--yellow:#dcdcaa;--orange:#ce9178;
+  --purple:#c586c0;--red:#f44747;--comment:#6a9955;--num:#b5cea8;
+  --string:#ce9178;--kw:#569cd6;--fn:#dcdcaa;--type:#4ec9b0;
+  --text:#d4d4d4;--text2:#858585;--text3:#4e4e4e;--text4:#cccccc;
+  --border:#454545;--border2:#333;
+  --tab-h:35px;--sidebar-w:220px;--activity-w:48px;--status-h:22px;
+}
+html,body{height:100%;overflow:hidden;font-family:'Consolas','Courier New',monospace;background:var(--bg);color:var(--text)}
+
+/* ── LAYOUT ── */
+#app{display:flex;flex-direction:column;height:100vh}
+#titlebar{height:30px;background:#323233;display:flex;align-items:center;justify-content:space-between;padding:0 16px;-webkit-app-region:drag;user-select:none;border-bottom:1px solid #111;flex-shrink:0}
+.tb-menu{display:flex;gap:2px;-webkit-app-region:no-drag}
+.tb-menu-item{font-size:12px;color:var(--text2);padding:4px 8px;border-radius:3px;cursor:pointer;font-family:'Segoe UI',sans-serif}
+.tb-menu-item:hover{background:var(--bg4);color:var(--text)}
+.tb-title{font-size:12px;color:var(--text2);font-family:'Segoe UI',sans-serif;position:absolute;left:50%;transform:translateX(-50%)}
+.tb-controls{display:flex;gap:6px;-webkit-app-region:no-drag}
+.tb-btn{width:12px;height:12px;border-radius:50%;cursor:pointer;border:none}
+.main-row{flex:1;display:flex;overflow:hidden;min-height:0}
+
+/* ── ACTIVITY BAR ── */
+#activity-bar{width:var(--activity-w);background:#333333;display:flex;flex-direction:column;align-items:center;padding:8px 0;gap:2px;border-right:1px solid #111;flex-shrink:0}
+.act-btn{width:36px;height:36px;display:flex;align-items:center;justify-content:center;cursor:pointer;border-radius:5px;font-size:18px;color:var(--text2);transition:color .15s;position:relative;border-left:2px solid transparent}
+.act-btn:hover{color:var(--text)}
+.act-btn.active{color:white;border-left-color:#569cd6}
+.act-spacer{flex:1}
+
+/* ── SIDEBAR ── */
+#sidebar{width:var(--sidebar-w);background:var(--bg2);border-right:1px solid var(--border2);display:flex;flex-direction:column;flex-shrink:0;overflow:hidden;transition:width .2s}
+#sidebar.hidden{width:0}
+.sidebar-title{font-size:10px;font-weight:700;color:var(--text2);padding:10px 12px 6px;text-transform:uppercase;letter-spacing:1.2px;font-family:'Segoe UI',sans-serif;flex-shrink:0}
+#file-tree{overflow-y:auto;flex:1}
+#file-tree::-webkit-scrollbar{width:4px}
+#file-tree::-webkit-scrollbar-thumb{background:#555}
+.folder{padding:3px 8px;cursor:pointer;font-size:12px;color:var(--text);display:flex;align-items:center;gap:5px;font-family:'Segoe UI',sans-serif;font-weight:600;user-select:none}
+.folder:hover{background:var(--bg3)}
+.folder-icon{font-size:11px;transition:transform .15s;display:inline-block}
+.folder.open .folder-icon{transform:rotate(90deg)}
+.file-item{display:flex;align-items:center;gap:7px;padding:3px 8px 3px 24px;cursor:pointer;font-size:12px;color:var(--text2);transition:background .1s;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;user-select:none;font-family:'Segoe UI',sans-serif}
+.file-item:hover{background:var(--bg3);color:var(--text)}
+.file-item.active{background:#094771;color:#fff}
+.file-dot{width:10px;height:10px;border-radius:2px;flex-shrink:0}
+.sidebar-footer{border-top:1px solid var(--border);padding:8px;flex-shrink:0}
+.git-info{font-size:10px;color:var(--text3);font-family:'Segoe UI',sans-serif;display:flex;align-items:center;gap:6px}
+
+/* ── EDITOR AREA ── */
+#editor-area{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
+#tabs-bar{height:var(--tab-h);background:#2d2d2d;display:flex;align-items:flex-end;border-bottom:1px solid #111;overflow-x:auto;flex-shrink:0}
+#tabs-bar::-webkit-scrollbar{height:0}
+.tab{display:flex;align-items:center;gap:8px;padding:0 14px;height:calc(var(--tab-h) - 1px);cursor:pointer;border-right:1px solid #111;font-size:12px;color:var(--text2);background:#2d2d2d;white-space:nowrap;min-width:90px;flex-shrink:0;font-family:'Segoe UI',sans-serif;position:relative;user-select:none}
+.tab::after{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:transparent}
+.tab.active{background:var(--bg);color:var(--text)}
+.tab.active::after{background:#569cd6}
+.tab.modified .tab-name::after{content:'●';font-size:8px;margin-left:4px;color:var(--text2)}
+.tab-close{font-size:14px;opacity:0;margin-left:auto;padding:1px 3px;border-radius:3px;line-height:1;cursor:pointer}
+.tab:hover .tab-close,.tab.active .tab-close{opacity:.6}
+.tab-close:hover{opacity:1!important;background:var(--bg4)}
+#editor-wrap{flex:1;display:flex;overflow:hidden;min-height:0;position:relative}
+#line-nums{width:48px;padding:10px 0;text-align:right;color:var(--text3);font-size:12px;line-height:20px;overflow:hidden;flex-shrink:0;background:var(--bg);border-right:1px solid var(--border);user-select:none;font-family:'Consolas','Courier New',monospace}
+.ln{padding:0 10px 0 4px;height:20px;display:flex;align-items:center;justify-content:flex-end;cursor:pointer;transition:color .1s}
+.ln:hover,.ln.hl{color:var(--text2)}
+#editor{flex:1;padding:10px 0 10px 16px;overflow:auto;outline:none;line-height:20px;background:var(--bg);white-space:pre;cursor:text;caret-color:white;font-size:13px;min-height:100%;font-family:'Consolas','Courier New',monospace}
+#editor::-webkit-scrollbar{width:10px;height:10px}
+#editor::-webkit-scrollbar-track{background:var(--bg)}
+#editor::-webkit-scrollbar-thumb{background:#555;border-radius:5px}
+#editor::-webkit-scrollbar-thumb:hover{background:#777}
+.current-line{background:rgba(255,255,255,0.04)!important}
+#minimap{width:80px;background:#1a1a1a;border-left:1px solid var(--border2);overflow:hidden;flex-shrink:0;position:relative;cursor:pointer;opacity:.7}
+.minimap-line{height:2px;margin:1px 4px;border-radius:1px;background:rgba(255,255,255,0.15)}
+.minimap-viewport{position:absolute;left:0;right:0;background:rgba(255,255,255,0.07);pointer-events:none}
+
+/* ── BREADCRUMB ── */
+#breadcrumb{height:24px;background:var(--bg2);border-bottom:1px solid var(--border2);display:flex;align-items:center;padding:0 12px;gap:4px;font-size:11px;color:var(--text2);flex-shrink:0;font-family:'Segoe UI',sans-serif}
+.bc-sep{color:var(--text3)}
+
+/* ── TERMINAL ── */
+#terminal-panel{background:#1e1e1e;border-top:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;transition:height .2s}
+#term-header{height:30px;background:#252526;display:flex;align-items:center;border-bottom:1px solid var(--border);padding:0 8px;gap:2px;flex-shrink:0}
+.term-tab-btn{font-size:11px;padding:4px 12px;border-radius:3px;cursor:pointer;color:var(--text2);font-family:'Segoe UI',sans-serif;user-select:none}
+.term-tab-btn.active{color:var(--text);background:var(--bg)}
+.term-tab-btn:hover:not(.active){background:var(--bg3);color:var(--text)}
+#term-actions{margin-left:auto;display:flex;gap:2px}
+.term-action-btn{width:26px;height:22px;display:flex;align-items:center;justify-content:center;cursor:pointer;border-radius:3px;color:var(--text2);font-size:13px}
+.term-action-btn:hover{background:var(--bg4);color:var(--text)}
+#term-body{flex:1;overflow:hidden;display:flex;flex-direction:column;min-height:0}
+#term-output{flex:1;overflow-y:auto;padding:6px 14px;font-size:12px;line-height:1.75;word-break:break-all}
+#term-output::-webkit-scrollbar{width:6px}
+#term-output::-webkit-scrollbar-thumb{background:#555}
+.t-line{display:flex;align-items:flex-start;gap:0}
+.t-prompt-str{color:#4ec9b0;margin-right:6px;white-space:nowrap;flex-shrink:0}
+#term-input-row{display:flex;align-items:center;padding:4px 14px 6px;flex-shrink:0}
+#term-input{flex:1;background:transparent;border:none;outline:none;color:var(--text);font-size:12px;font-family:'Consolas','Courier New',monospace;caret-color:white}
+
+/* ── STATUS BAR ── */
+#statusbar{height:var(--status-h);background:#007acc;display:flex;align-items:center;padding:0 10px;flex-shrink:0;user-select:none}
+.sb-item{font-size:11px;color:rgba(255,255,255,.85);cursor:pointer;padding:0 6px;height:100%;display:flex;align-items:center;gap:4px;font-family:'Segoe UI',sans-serif}
+.sb-item:hover{background:rgba(255,255,255,.15)}
+.sb-sep{width:1px;height:14px;background:rgba(255,255,255,.2);margin:0 2px}
+#sb-right{margin-left:auto;display:flex;align-items:center}
+.sb-errors{background:#e51400}
+.sb-warn{background:rgba(255,255,255,.1)}
+
+/* ── CONTEXT MENU ── */
+#ctx-menu{position:fixed;background:var(--bg2);border:1px solid var(--border2);border-radius:5px;padding:4px 0;min-width:180px;z-index:999;box-shadow:0 4px 16px rgba(0,0,0,.5);display:none}
+.ctx-item{padding:6px 16px;font-size:12px;color:var(--text);cursor:pointer;font-family:'Segoe UI',sans-serif;display:flex;justify-content:space-between;align-items:center}
+.ctx-item:hover{background:#094771}
+.ctx-sep{height:1px;background:var(--border);margin:3px 0}
+.ctx-shortcut{color:var(--text3);font-size:11px}
+
+/* ── TOOLTIP ── */
+.tooltip{position:absolute;background:var(--bg2);border:1px solid var(--border2);padding:4px 8px;font-size:11px;border-radius:4px;pointer-events:none;color:var(--text);font-family:'Segoe UI',sans-serif;z-index:500;white-space:nowrap}
+
+/* ── SEARCH PANEL ── */
+#search-panel{position:absolute;top:6px;right:20px;background:var(--bg2);border:1px solid var(--border2);border-radius:5px;padding:8px 10px;display:none;z-index:100;box-shadow:0 4px 12px rgba(0,0,0,.4)}
+#search-panel.visible{display:flex;gap:6px;align-items:center}
+#search-input{background:var(--bg3);border:1px solid var(--border);border-radius:3px;color:var(--text);font-size:12px;padding:4px 8px;outline:none;font-family:inherit;width:200px}
+#search-input:focus{border-color:var(--accent)}
+.search-btn{padding:3px 8px;background:var(--bg3);border:1px solid var(--border);border-radius:3px;color:var(--text2);font-size:11px;cursor:pointer;font-family:'Segoe UI',sans-serif}
+.search-btn:hover{color:var(--text)}
+.hl-match{background:#613315;border-radius:2px}
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- Title bar -->
+  <div id="titlebar">
+    <div class="tb-menu">
+      <div class="tb-menu-item" onclick="menuAction('file')">Fichier</div>
+      <div class="tb-menu-item" onclick="menuAction('edit')">Édition</div>
+      <div class="tb-menu-item" onclick="menuAction('view')">Affichage</div>
+      <div class="tb-menu-item" onclick="menuAction('terminal')">Terminal</div>
+      <div class="tb-menu-item" onclick="menuAction('help')">Aide</div>
+    </div>
+    <div class="tb-title">NathanCode</div>
+    <div class="tb-controls">
+      <div class="tb-btn" style="background:#ff5f57" onclick="if(window.close)window.close()" title="Fermer"></div>
+      <div class="tb-btn" style="background:#febc2e" onclick="document.getElementById('app').style.display='none'" title="Réduire"></div>
+      <div class="tb-btn" style="background:#28c840" title="Agrandir"></div>
+    </div>
+  </div>
+
+  <div class="main-row">
+
+    <!-- Activity bar -->
+    <div id="activity-bar">
+      <div class="act-btn active" id="act-explorer" onclick="toggleSidebar('explorer')" title="Explorateur">&#9723;</div>
+      <div class="act-btn" id="act-search" onclick="toggleSidebar('search')" title="Rechercher">&#128269;</div>
+      <div class="act-btn" id="act-git" onclick="toggleSidebar('git')" title="Contrôle de source">&#9898;</div>
+      <div class="act-btn" id="act-ext" onclick="toggleSidebar('ext')" title="Extensions">&#9635;</div>
+      <div class="act-spacer"></div>
+      <div class="act-btn" onclick="toggleSidebar('settings')" title="Paramètres">&#9881;</div>
+    </div>
+
+    <!-- Sidebar -->
+    <div id="sidebar">
+      <div id="sidebar-content-explorer">
+        <div class="sidebar-title">Explorateur</div>
+        <div id="file-tree"></div>
+        <div class="sidebar-footer">
+          <div class="git-info"><span>&#9898;</span><span>main — 0 modifications</span></div>
+        </div>
+      </div>
+      <div id="sidebar-content-search" style="display:none;flex-direction:column;flex:1">
+        <div class="sidebar-title">Rechercher</div>
+        <div style="padding:8px">
+          <input id="global-search" style="width:100%;background:#3c3c3c;border:1px solid #555;border-radius:3px;color:var(--text);font-size:12px;padding:5px 8px;outline:none;font-family:inherit" placeholder="Rechercher dans les fichiers..." oninput="globalSearch(this.value)"/>
+        </div>
+        <div id="search-results" style="overflow-y:auto;flex:1;font-size:11px;color:var(--text2);padding:0 8px;font-family:'Segoe UI',sans-serif"></div>
+      </div>
+      <div id="sidebar-content-git" style="display:none;flex-direction:column;flex:1">
+        <div class="sidebar-title">Contrôle de source</div>
+        <div style="padding:12px;font-size:12px;color:var(--text2);font-family:'Segoe UI',sans-serif">
+          <div style="margin-bottom:8px;color:var(--text)">&#9898; Branche : main</div>
+          <div style="color:var(--yellow)">M index.js</div>
+          <div style="color:var(--yellow)">M style.css</div>
+          <div style="margin-top:12px">
+            <button onclick="termCmd('git status')" style="background:#0e639c;border:none;color:white;padding:5px 10px;border-radius:3px;cursor:pointer;font-size:11px;font-family:'Segoe UI',sans-serif">git status</button>
+          </div>
+        </div>
+      </div>
+      <div id="sidebar-content-ext" style="display:none;flex-direction:column;flex:1">
+        <div class="sidebar-title">Extensions</div>
+        <div style="padding:8px;font-size:11px;color:var(--text2);font-family:'Segoe UI',sans-serif">
+          <div style="padding:8px;background:var(--bg3);border-radius:4px;margin-bottom:6px"><div style="color:var(--text);font-weight:600">Prettier</div><div>Formateur de code</div><div style="color:var(--green);margin-top:3px">● Installé</div></div>
+          <div style="padding:8px;background:var(--bg3);border-radius:4px;margin-bottom:6px"><div style="color:var(--text);font-weight:600">ESLint</div><div>Linter JavaScript</div><div style="color:var(--green);margin-top:3px">● Installé</div></div>
+          <div style="padding:8px;background:var(--bg3);border-radius:4px"><div style="color:var(--text);font-weight:600">GitLens</div><div>Historique Git inline</div><div style="color:var(--yellow);margin-top:3px">○ Non installé</div></div>
+        </div>
+      </div>
+      <div id="sidebar-content-settings" style="display:none;flex-direction:column;flex:1">
+        <div class="sidebar-title">Paramètres</div>
+        <div style="padding:10px;font-size:12px;font-family:'Segoe UI',sans-serif">
+          <div style="margin-bottom:10px">
+            <div style="color:var(--text2);margin-bottom:4px">Taille de police</div>
+            <input type="range" min="10" max="20" value="13" oninput="document.getElementById('editor').style.fontSize=this.value+'px';document.getElementById('line-nums').style.fontSize=this.value+'px'" style="width:100%"/>
+          </div>
+          <div style="margin-bottom:10px">
+            <div style="color:var(--text2);margin-bottom:4px">Thème</div>
+            <select onchange="changeTheme(this.value)" style="width:100%;background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:4px;border-radius:3px;font-size:12px">
+              <option value="dark">Dark (défaut)</option>
+              <option value="monokai">Monokai</option>
+              <option value="light">Light</option>
+            </select>
+          </div>
+          <div>
+            <div style="color:var(--text2);margin-bottom:4px">Rendu à la ligne</div>
+            <label style="color:var(--text);display:flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox" onchange="document.getElementById('editor').style.whiteSpace=this.checked?'pre-wrap':'pre'"/> Activer</label>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Editor -->
+    <div id="editor-area">
+      <div id="breadcrumb"></div>
+      <div id="tabs-bar"></div>
+      <div id="editor-wrap">
+        <div id="line-nums"></div>
+        <div id="editor" contenteditable="true" spellcheck="false"
+          onkeydown="handleKey(event)"
+          oninput="onEditorInput()"
+          onclick="onEditorClick()"
+          onscroll="syncScroll()"
+          oncontextmenu="showCtxMenu(event)"></div>
+        <div id="minimap"></div>
+        <div id="search-panel">
+          <input id="search-input" placeholder="Rechercher..." oninput="searchInFile(this.value)" onkeydown="if(event.key==='Escape')closeSearch()"/>
+          <button class="search-btn" onclick="searchNext()">Suivant</button>
+          <button class="search-btn" onclick="closeSearch()">&#215;</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Terminal -->
+  <div id="terminal-panel" style="height:200px">
+    <div id="term-header">
+      <div class="term-tab-btn active" onclick="switchTermTab(this,'terminal')">TERMINAL</div>
+      <div class="term-tab-btn" onclick="switchTermTab(this,'output')">SORTIE</div>
+      <div class="term-tab-btn" onclick="switchTermTab(this,'problems')">PROBLÈMES</div>
+      <div class="term-tab-btn" onclick="switchTermTab(this,'debug')">CONSOLE DE DÉBOGAGE</div>
+      <div id="term-actions">
+        <div class="term-action-btn" onclick="addTerminal()" title="Nouveau terminal">+</div>
+        <div class="term-action-btn" onclick="clearTerminal()" title="Effacer">&#9003;</div>
+        <div class="term-action-btn" onclick="toggleTerminal()" title="Fermer">&#215;</div>
+      </div>
+    </div>
+    <div id="term-body">
+      <div id="term-output"></div>
+      <div id="term-input-row">
+        <span class="t-prompt-str" id="term-prompt">nathancode $</span>
+        <input id="term-input" autocomplete="off" spellcheck="false" onkeydown="handleTermKey(event)" placeholder=""/>
+      </div>
+    </div>
+  </div>
+
+  <!-- Status bar -->
+  <div id="statusbar">
+    <div class="sb-item sb-errors" id="sb-errors">&#9888; 0 &nbsp; &#9651; 0</div>
+    <div class="sb-sep"></div>
+    <div class="sb-item">&#9898; main</div>
+    <div class="sb-sep"></div>
+    <div class="sb-item">&#9651; 0 &#9660; 0</div>
+    <div id="sb-right">
+      <div class="sb-item sb-warn" id="sb-encoding">UTF-8</div>
+      <div class="sb-sep"></div>
+      <div class="sb-item" id="sb-eol">LF</div>
+      <div class="sb-sep"></div>
+      <div class="sb-item" id="sb-lang">JavaScript</div>
+      <div class="sb-sep"></div>
+      <div class="sb-item" id="sb-pos">Ln 1, Col 1</div>
+      <div class="sb-sep"></div>
+      <div class="sb-item" id="sb-indent">Espaces: 2</div>
+    </div>
+  </div>
+</div>
+
+<!-- Context menu -->
+<div id="ctx-menu">
+  <div class="ctx-item" onclick="ctxAction('cut')">Couper <span class="ctx-shortcut">Ctrl+X</span></div>
+  <div class="ctx-item" onclick="ctxAction('copy')">Copier <span class="ctx-shortcut">Ctrl+C</span></div>
+  <div class="ctx-item" onclick="ctxAction('paste')">Coller <span class="ctx-shortcut">Ctrl+V</span></div>
+  <div class="ctx-sep"></div>
+  <div class="ctx-item" onclick="ctxAction('selectAll')">Tout sélectionner <span class="ctx-shortcut">Ctrl+A</span></div>
+  <div class="ctx-sep"></div>
+  <div class="ctx-item" onclick="ctxAction('format')">Formater le document <span class="ctx-shortcut">Shift+Alt+F</span></div>
+  <div class="ctx-item" onclick="ctxAction('comment')">Commenter <span class="ctx-shortcut">Ctrl+/</span></div>
+</div>
+
+<script>
+// ══════════════════════════════════════════
+//  FILE DATA
+// ══════════════════════════════════════════
+const FILES = {
+  'index.js': {
+    lang:'javascript', icon:'js', color:'#f7df1e',
+    content:`// NathanCode — Exemple Express.js
+const express = require('express');
+const path    = require('path');
+const app     = express();
+const PORT    = process.env.PORT || 3000;
+
+app.use(express.json());
+app.use(express.static('public'));
+
+// Route principale
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public/index.html'));
+});
+
+// API
+app.get('/api/status', (req, res) => {
+  res.json({
+    status: 'ok',
+    version: '1.0.0',
+    uptime: process.uptime()
+  });
+});
+
+app.post('/api/echo', (req, res) => {
+  const { message } = req.body;
+  if (!message) {
+    return res.status(400).json({ error: 'message requis' });
+  }
+  res.json({ echo: message, timestamp: Date.now() });
+});
+
+// Démarrage
+app.listen(PORT, () => {
+  console.log(\`✓ Serveur lancé : http://localhost:\${PORT}\`);
+});`
+  },
+  'style.css': {
+    lang:'css', icon:'css', color:'#264de4',
+    content:`/* NathanCode — Styles globaux */
+:root {
+  --primary:   #569cd6;
+  --success:   #4ec9b0;
+  --warning:   #dcdcaa;
+  --danger:    #f44747;
+  --bg:        #1e1e1e;
+  --bg2:       #252526;
+  --text:      #d4d4d4;
+  --radius:    8px;
+  --transition:200ms ease;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0; padding: 0;
+}
+
+body {
+  font-family: 'Segoe UI', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+/* Buttons */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--primary);
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: var(--radius);
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  transition: opacity var(--transition);
+}
+.btn:hover { opacity: .85; }
+.btn:active { transform: scale(.98); }
+
+/* Cards */
+.card {
+  background: var(--bg2);
+  border-radius: var(--radius);
+  padding: 20px;
+  border: 1px solid rgba(255,255,255,.08);
+}`
+  },
+  'README.md': {
+    lang:'markdown', icon:'md', color:'#83a598',
+    content:`# NathanCode
+
+Éditeur de code moderne inspiré de Visual Studio Code.
+
+## Fonctionnalités
+
+- Coloration syntaxique (JS, CSS, Python, JSON, Markdown)
+- Terminal intégré avec commandes
+- Explorateur de fichiers
+- Onglets multiples
+- Recherche dans le fichier (Ctrl+F)
+- Minimap
+- Raccourcis clavier
+
+## Raccourcis
+
+| Raccourci       | Action                |
+|-----------------|-----------------------|
+| Ctrl+S          | Sauvegarder           |
+| Ctrl+F          | Rechercher            |
+| Ctrl+/          | Commenter la ligne    |
+| Ctrl+D          | Dupliquer la ligne    |
+| Ctrl+\`          | Terminal              |
+| Tab             | Indenter              |
+| Shift+Alt+F     | Formater              |
+
+## Lancer le projet
+
+\`\`\`bash
+npm install
+npm start
+\`\`\`
+
+## Technologies
+
+- Node.js + Express
+- HTML/CSS/JS (vanilla)
+- Electron (desktop)
+`
+  },
+  'server.py': {
+    lang:'python', icon:'py', color:'#3572A5',
+    content:`# NathanCode — Serveur Python Flask
+from flask import Flask, jsonify, request
+from datetime import datetime
+import os, json
+
+app = Flask(__name__)
+app.config['JSON_SORT_KEYS'] = False
+
+DATA_FILE = 'data.json'
+
+def load_data():
+    if os.path.exists(DATA_FILE):
+        with open(DATA_FILE, 'r') as f:
+            return json.load(f)
+    return []
+
+def save_data(data):
+    with open(DATA_FILE, 'w') as f:
+        json.dump(data, f, indent=2, ensure_ascii=False)
+
+@app.route('/')
+def index():
+    return jsonify({
+        'app': 'NathanCode API',
+        'version': '1.0.0',
+        'time': datetime.now().isoformat()
+    })
+
+@app.route('/api/items', methods=['GET'])
+def get_items():
+    items = load_data()
+    return jsonify({'items': items, 'total': len(items)})
+
+@app.route('/api/items', methods=['POST'])
+def create_item():
+    body = request.get_json()
+    if not body or 'name' not in body:
+        return jsonify({'error': 'name est requis'}), 400
+    items = load_data()
+    item = {
+        'id': len(items) + 1,
+        'name': body['name'],
+        'created': datetime.now().isoformat()
+    }
+    items.append(item)
+    save_data(items)
+    return jsonify(item), 201
+
+@app.route('/api/items/<int:item_id>', methods=['DELETE'])
+def delete_item(item_id):
+    items = load_data()
+    items = [i for i in items if i['id'] != item_id]
+    save_data(items)
+    return jsonify({'deleted': item_id})
+
+if __name__ == '__main__':
+    port = int(os.environ.get('PORT', 5000))
+    print(f'Serveur Flask sur http://localhost:{port}')
+    app.run(debug=True, port=port)`
+  },
+  'package.json': {
+    lang:'json', icon:'json', color:'#cbcb41',
+    content:`{
+  "name": "nathancode-app",
+  "version": "1.0.0",
+  "description": "Application créée avec NathanCode",
+  "main": "index.js",
+  "scripts": {
+    "start":   "node index.js",
+    "dev":     "nodemon index.js",
+    "test":    "jest --coverage",
+    "build":   "webpack --mode production",
+    "lint":    "eslint src/",
+    "format":  "prettier --write ."
+  },
+  "dependencies": {
+    "express":    "^4.18.2",
+    "dotenv":     "^16.0.3",
+    "mongoose":   "^7.4.0",
+    "cors":       "^2.8.5",
+    "helmet":     "^7.0.0"
+  },
+  "devDependencies": {
+    "nodemon":    "^3.0.1",
+    "jest":       "^29.0.0",
+    "eslint":     "^8.45.0",
+    "prettier":   "^3.0.0",
+    "webpack":    "^5.88.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "author": "NathanFR3",
+  "license": "MIT"
+}`
+  },
+};
+
+const FOLDERS = {
+  'mon-projet': ['index.js','style.css','README.md','server.py','package.json']
+};
+
+// ══════════════════════════════════════════
+//  STATE
+// ══════════════════════════════════════════
+let currentFile  = 'index.js';
+let openTabs     = ['index.js'];
+let modified     = new Set();
+let termHistory  = [];
+let histIdx      = -1;
+let currentPanel = 'terminal';
+let sidebarMode  = 'explorer';
+let terminalVisible = true;
+let searchMatches = [];
+let searchIdx = 0;
+
+// ══════════════════════════════════════════
+//  SYNTAX HIGHLIGHTING
+// ══════════════════════════════════════════
+function highlight(code, lang) {
+  let h = code
+    .replace(/&/g,'&amp;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;');
+
+  if (lang === 'javascript') {
+    h = h.replace(/(\/\/[^\n]*)/g,'<span style="color:#6a9955">$1</span>');
+    h = h.replace(/(\/\*[\s\S]*?\*\/)/g,'<span style="color:#6a9955">$1</span>');
+    h = h.replace(/(`(?:[^`\\]|\\.)*`)/g,'<span style="color:#ce9178">$1</span>');
+    h = h.replace(/("(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*')/g,'<span style="color:#ce9178">$1</span>');
+    h = h.replace(/\b(const|let|var|function|return|if|else|for|while|do|switch|case|break|continue|class|extends|new|this|super|import|export|default|from|async|await|typeof|instanceof|in|of|try|catch|finally|throw|delete|void|null|undefined|true|false)\b/g,'<span style="color:#569cd6">$1</span>');
+    h = h.replace(/\b(require|console|process|module|exports|Promise|Array|Object|String|Number|Math|Date|JSON|Error|setTimeout|setInterval|clearTimeout|fetch|Response|Request|Map|Set|Symbol)\b/g,'<span style="color:#4ec9b0">$1</span>');
+    h = h.replace(/\b([A-Z][a-zA-Z0-9_]*)\b(?=\s*\()/g,'<span style="color:#dcdcaa">$1</span>');
+    h = h.replace(/\b(\d+\.?\d*)\b/g,'<span style="color:#b5cea8">$1</span>');
+  } else if (lang === 'css') {
+    h = h.replace(/(\/\*[\s\S]*?\*\/)/g,'<span style="color:#6a9955">$1</span>');
+    h = h.replace(/(:root|html|body|\*|[a-zA-Z][\w-]*)(\s*\{)/g,'<span style="color:#d7ba7d">$1</span>$2');
+    h = h.replace(/([.#:][a-zA-Z][\w-]*)(\s*[{,])/g,'<span style="color:#4ec9b0">$1</span>$2');
+    h = h.replace(/([\w-]+)\s*:/g,'<span style="color:#9cdcfe">$1</span>:');
+    h = h.replace(/(--[\w-]+)/g,'<span style="color:#ce9178">$1</span>');
+    h = h.replace(/#([0-9a-fA-F]{3,6})\b/g,'<span style="color:#d7ba7d">#$1</span>');
+    h = h.replace(/('(?:[^']*)' | "(?:[^"]*)")/g,'<span style="color:#ce9178">$1</span>');
+    h = h.replace(/\b(\d+\.?\d*)(px|em|rem|vh|vw|%|s|ms)?\b/g,'<span style="color:#b5cea8">$1$2</span>');
+  } else if (lang === 'python') {
+    h = h.replace(/(#[^\n]*)/g,'<span style="color:#6a9955">$1</span>');
+    h = h.replace(/("""[\s\S]*?"""|'''[\s\S]*?''')/g,'<span style="color:#ce9178">$1</span>');
+    h = h.replace(/("(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*')/g,'<span style="color:#ce9178">$1</span>');
+    h = h.replace(/\b(def|class|return|if|elif|else|for|while|and|or|not|in|is|import|from|as|with|try|except|finally|raise|pass|lambda|yield|global|nonlocal|del|assert|True|False|None|async|await)\b/g,'<span style="color:#569cd6">$1</span>');
+    h = h.replace(/\b(print|len|range|str|int|float|list|dict|set|tuple|open|type|isinstance|hasattr|getattr|setattr|enumerate|zip|map|filter|sorted|reversed|sum|min|max|abs|round|input|super|staticmethod|classmethod|property)\b/g,'<span style="color:#4ec9b0">$1</span>');
+    h = h.replace(/\b(@[\w]+)/g,'<span style="color:#569cd6">$1</span>');
+    h = h.replace(/\b(\d+\.?\d*)\b/g,'<span style="color:#b5cea8">$1</span>');
+    h = h.replace(/\b([a-z_][a-zA-Z0-9_]*)\s*(?=\()/g,'<span style="color:#dcdcaa">$1</span>');
+  } else if (lang === 'json') {
+    h = h.replace(/"([^"\\]*(\\.[^"\\]*)*)"\s*:/g,'<span style="color:#9cdcfe">"$1"</span>:');
+    h = h.replace(/:\s*"([^"\\]*(\\.[^"\\]*)*)"/g,': <span style="color:#ce9178">"$1"</span>');
+    h = h.replace(/\b(true|false|null)\b/g,'<span style="color:#569cd6">$1</span>');
+    h = h.replace(/\b(\d+\.?\d*)\b/g,'<span style="color:#b5cea8">$1</span>');
+  } else if (lang === 'markdown') {
+    h = h.replace(/^(#{1,6}\s.+)$/gm,'<span style="color:#569cd6;font-weight:bold">$1</span>');
+    h = h.replace(/\*\*([^*]+)\*\*/g,'<span style="color:#dcdcaa;font-weight:bold">**$1**</span>');
+    h = h.replace(/\*([^*]+)\*/g,'<span style="color:#d4d4d4;font-style:italic">*$1*</span>');
+    h = h.replace(/`([^`]+)`/g,'<span style="color:#ce9178">`$1`</span>');
+    h = h.replace(/^(\`\`\`[^\n]*\n[\s\S]*?\n\`\`\`)$/gm,'<span style="color:#6a9955">$1</span>');
+    h = h.replace(/^(\|.+\|)$/gm,'<span style="color:#4ec9b0">$1</span>');
+    h = h.replace(/^([-*]\s.+)$/gm,'<span style="color:#d4d4d4">$1</span>');
+    h = h.replace(/^(\d+\.\s.+)$/gm,'<span style="color:#b5cea8">$1</span>');
+    h = h.replace(/\[([^\]]+)\]\(([^)]+)\)/g,'<span style="color:#569cd6">[$1]</span><span style="color:#4ec9b0">($2)</span>');
+  }
+  return h;
+}
+
+// ══════════════════════════════════════════
+//  FILE TREE
+// ══════════════════════════════════════════
+function buildFileTree() {
+  const tree = document.getElementById('file-tree');
+  let html = '';
+  for (const [folder, files] of Object.entries(FOLDERS)) {
+    html += `<div class="folder open" onclick="this.classList.toggle('open');this.nextElementSibling.style.display=this.classList.contains('open')?'block':'none'">
+      <span class="folder-icon">&#9658;</span> ${folder}
+    </div>
+    <div>`;
+    for (const f of files) {
+      const fd = FILES[f];
+      html += `<div class="file-item${f===currentFile?' active':''}" onclick="openFile('${f}')" data-file="${f}">
+        <div class="file-dot" style="background:${fd.color}"></div>${f}
+      </div>`;
+    }
+    html += '</div>';
+  }
+  tree.innerHTML = html;
+}
+
+// ══════════════════════════════════════════
+//  EDITOR
+// ══════════════════════════════════════════
+function renderEditor(file) {
+  const fd = FILES[file];
+  const editor = document.getElementById('editor');
+  editor.innerHTML = highlight(fd.content, fd.lang);
+  renderLineNums(fd.content);
+  renderMinimap(fd.content);
+  updateBreadcrumb(file);
+  document.getElementById('sb-lang').textContent = {
+    javascript:'JavaScript',css:'CSS',python:'Python',json:'JSON',markdown:'Markdown'
+  }[fd.lang] || fd.lang;
+}
+
+function renderLineNums(code) {
+  const lines = code.split('\n');
+  document.getElementById('line-nums').innerHTML =
+    lines.map((_,i) => `<div class="ln" id="ln${i+1}">${i+1}</div>`).join('');
+}
+
+function renderMinimap(code) {
+  const mm = document.getElementById('minimap');
+  const lines = code.split('\n').slice(0,80);
+  mm.innerHTML = lines.map(l => {
+    const w = Math.min(100, l.trimEnd().length * 1.1);
+    return `<div class="minimap-line" style="width:${w}%"></div>`;
+  }).join('');
+}
+
+function updateBreadcrumb(file) {
+  document.getElementById('breadcrumb').innerHTML =
+    `<span style="color:#858585">mon-projet</span><span class="bc-sep"> &rsaquo; </span><span style="color:#d4d4d4">${file}</span>`;
+}
+
+function openFile(file) {
+  currentFile = file;
+  if (!openTabs.includes(file)) {
+    openTabs.push(file);
+  }
+  renderTabs();
+  renderEditor(file);
+  buildFileTree();
+  document.getElementById('term-prompt').textContent = `${file.split('.')[0]} $`;
+}
+
+function renderTabs() {
+  const bar = document.getElementById('tabs-bar');
+  bar.innerHTML = openTabs.map(f => {
+    const fd = FILES[f];
+    const isActive = f === currentFile;
+    const isMod = modified.has(f);
+    return `<div class="tab${isActive?' active':''}${isMod?' modified':''}" data-file="${f}" onclick="openFile('${f}')">
+      <div class="file-dot" style="background:${fd.color};width:8px;height:8px;border-radius:2px"></div>
+      <span class="tab-name">${f}</span>
+      <span class="tab-close" onclick="closeTab(event,'${f}')">&#215;</span>
+    </div>`;
+  }).join('');
+}
+
+function closeTab(e, file) {
+  e.stopPropagation();
+  openTabs = openTabs.filter(f => f !== file);
+  modified.delete(file);
+  if (openTabs.length === 0) {
+    document.getElementById('tabs-bar').innerHTML = '';
+    document.getElementById('editor').innerHTML = '';
+    document.getElementById('line-nums').innerHTML = '';
+    return;
+  }
+  if (currentFile === file) {
+    currentFile = openTabs[openTabs.length-1];
+  }
+  renderTabs();
+  renderEditor(currentFile);
+}
+
+// ══════════════════════════════════════════
+//  EDITOR INPUT
+// ══════════════════════════════════════════
+function onEditorInput() {
+  const editor = document.getElementById('editor');
+  const text = editor.innerText;
+  FILES[currentFile].content = text;
+  modified.add(currentFile);
+
+  // Re-highlight preserving cursor
+  const sel = window.getSelection();
+  let offset = 0;
+  if (sel.rangeCount) {
+    const pre = document.createRange();
+    pre.selectNodeContents(editor);
+    pre.setEnd(sel.getRangeAt(0).startContainer, sel.getRangeAt(0).startOffset);
+    offset = pre.toString().length;
+  }
+  editor.innerHTML = highlight(text, FILES[currentFile].lang);
+  renderLineNums(text);
+  renderMinimap(text);
+  renderTabs();
+  restoreCursor(editor, offset);
+  updatePos();
+}
+
+function onEditorClick() {
+  updatePos();
+}
+
+function restoreCursor(el, offset) {
+  try {
+    const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+    let node, count = 0;
+    while ((node = walker.nextNode())) {
+      if (count + node.length >= offset) {
+        const r = document.createRange();
+        r.setStart(node, Math.min(offset - count, node.length));
+        r.collapse(true);
+        const s = window.getSelection();
+        s.removeAllRanges(); s.addRange(r);
+        return;
+      }
+      count += node.length;
+    }
+  } catch(e) {}
+}
+
+function updatePos() {
+  try {
+    const sel = window.getSelection();
+    if (!sel.rangeCount) return;
+    const pre = document.createRange();
+    pre.selectNodeContents(document.getElementById('editor'));
+    pre.setEnd(sel.getRangeAt(0).startContainer, sel.getRangeAt(0).startOffset);
+    const txt = pre.toString();
+    const lines = txt.split('\n');
+    document.getElementById('sb-pos').textContent = `Ln ${lines.length}, Col ${lines[lines.length-1].length+1}`;
+  } catch(e) {}
+}
+
+function syncScroll() {
+  const editor = document.getElementById('editor');
+  const lnums  = document.getElementById('line-nums');
+  lnums.scrollTop = editor.scrollTop;
+}
+
+// ══════════════════════════════════════════
+//  KEY HANDLING
+// ══════════════════════════════════════════
+function handleKey(e) {
+  // Tab → indent
+  if (e.key === 'Tab') {
+    e.preventDefault();
+    document.execCommand('insertText', false, '  ');
+    return;
+  }
+  // Ctrl+S — save
+  if ((e.ctrlKey||e.metaKey) && e.key === 's') {
+    e.preventDefault();
+    modified.delete(currentFile);
+    renderTabs();
+    termPrint(`<span style="color:#4ec9b0">✓ Sauvegardé : ${currentFile}</span>`);
+    return;
+  }
+  // Ctrl+F — find
+  if ((e.ctrlKey||e.metaKey) && e.key === 'f') {
+    e.preventDefault();
+    const p = document.getElementById('search-panel');
+    p.classList.add('visible');
+    document.getElementById('search-input').focus();
+    return;
+  }
+  // Ctrl+` — terminal
+  if ((e.ctrlKey||e.metaKey) && e.key === '`') {
+    e.preventDefault();
+    toggleTerminal();
+    return;
+  }
+  // Ctrl+/ — comment
+  if ((e.ctrlKey||e.metaKey) && e.key === '/') {
+    e.preventDefault();
+    commentLine();
+    return;
+  }
+  // Ctrl+D — duplicate line
+  if ((e.ctrlKey||e.metaKey) && e.key === 'd') {
+    e.preventDefault();
+    duplicateLine();
+    return;
+  }
+  // Escape — close search
+  if (e.key === 'Escape') {
+    closeSearch();
+  }
+  setTimeout(updatePos, 0);
+}
+
+function commentLine() {
+  const lang = FILES[currentFile].lang;
+  const prefix = lang === 'python' ? '# ' : '// ';
+  document.execCommand('insertText', false, prefix);
+}
+
+function duplicateLine() {
+  const editor = document.getElementById('editor');
+  const text = editor.innerText;
+  const sel = window.getSelection();
+  if (!sel.rangeCount) return;
+  const pre = document.createRange();
+  pre.selectNodeContents(editor);
+  pre.setEnd(sel.getRangeAt(0).startContainer, sel.getRangeAt(0).startOffset);
+  const offset = pre.toString().length;
+  const lines = text.split('\n');
+  let cum = 0, lineIdx = 0;
+  for (let i = 0; i < lines.length; i++) {
+    if (cum + lines[i].length >= offset) { lineIdx = i; break; }
+    cum += lines[i].length + 1;
+  }
+  document.execCommand('insertText', false, '\n' + lines[lineIdx]);
+}
+
+// ══════════════════════════════════════════
+//  SEARCH
+// ══════════════════════════════════════════
+function searchInFile(query) {
+  if (!query) { closeSearch(); return; }
+  const editor = document.getElementById('editor');
+  const text = FILES[currentFile].content;
+  const lang = FILES[currentFile].lang;
+  let highlighted = highlight(text, lang);
+  const re = new RegExp(query.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'), 'gi');
+  highlighted = highlighted.replace(re, m => `<span class="hl-match">${m}</span>`);
+  editor.innerHTML = highlighted;
+}
+
+function searchNext() {}
+function closeSearch() {
+  document.getElementById('search-panel').classList.remove('visible');
+  renderEditor(currentFile);
+}
+
+// ══════════════════════════════════════════
+//  CONTEXT MENU
+// ══════════════════════════════════════════
+function showCtxMenu(e) {
+  e.preventDefault();
+  const menu = document.getElementById('ctx-menu');
+  menu.style.display = 'block';
+  menu.style.left = Math.min(e.clientX, window.innerWidth-200) + 'px';
+  menu.style.top  = Math.min(e.clientY, window.innerHeight-200) + 'px';
+}
+
+document.addEventListener('click', () => {
+  document.getElementById('ctx-menu').style.display = 'none';
+});
+
+function ctxAction(action) {
+  if (action === 'cut')       document.execCommand('cut');
+  else if (action === 'copy') document.execCommand('copy');
+  else if (action === 'paste')document.execCommand('paste');
+  else if (action === 'selectAll') document.execCommand('selectAll');
+  else if (action === 'format') termPrint('<span style="color:#4ec9b0">✓ Document formaté</span>');
+  else if (action === 'comment') commentLine();
+}
+
+// ══════════════════════════════════════════
+//  SIDEBAR
+// ══════════════════════════════════════════
+function toggleSidebar(mode) {
+  const sidebar = document.getElementById('sidebar');
+  const allPanels = ['explorer','search','git','ext','settings'];
+  allPanels.forEach(p => {
+    const el = document.getElementById('sidebar-content-'+p);
+    if (el) el.style.display = 'none';
+  });
+  document.querySelectorAll('.act-btn').forEach(b => b.classList.remove('active'));
+
+  if (sidebarMode === mode && !sidebar.classList.contains('hidden')) {
+    sidebar.classList.add('hidden');
+    sidebarMode = '';
+  } else {
+    sidebar.classList.remove('hidden');
+    sidebarMode = mode;
+    const panel = document.getElementById('sidebar-content-'+mode);
+    if (panel) panel.style.display = 'flex';
+    const btn = document.getElementById('act-'+mode);
+    if (btn) btn.classList.add('active');
+    else document.querySelectorAll('.act-btn')[0].classList.add('active');
+  }
+}
+
+function globalSearch(q) {
+  const res = document.getElementById('search-results');
+  if (!q) { res.innerHTML = ''; return; }
+  let html = '';
+  for (const [fname, fd] of Object.entries(FILES)) {
+    const lines = fd.content.split('\n');
+    lines.forEach((line, i) => {
+      if (line.toLowerCase().includes(q.toLowerCase())) {
+        html += `<div onclick="openFile('${fname}')" style="padding:4px 6px;cursor:pointer;border-bottom:1px solid #333" onmouseover="this.style.background='#2a2d2e'" onmouseout="this.style.background=''">
+          <div style="color:#d4d4d4">${fname} <span style="color:#858585">:${i+1}</span></div>
+          <div style="color:#9cdcfe;font-family:Consolas,monospace">${line.trim().slice(0,60)}</div>
+        </div>`;
+      }
+    });
+  }
+  res.innerHTML = html || '<div style="padding:8px;color:#858585">Aucun résultat</div>';
+}
+
+// ══════════════════════════════════════════
+//  TERMINAL
+// ══════════════════════════════════════════
+const CMDS = {
+  'ls':    () => Object.keys(FILES).join('  '),
+  'pwd':   () => '/home/user/mon-projet',
+  'whoami':() => 'nathanfr3',
+  'date':  () => new Date().toLocaleString('fr-FR'),
+  'uname': () => 'NathanCode OS v1.0 (web)',
+  'node -v':() => 'v22.0.0',
+  'npm -v': () => '10.5.0',
+  'python --version':() => 'Python 3.11.4',
+  'python3 --version':() => 'Python 3.11.4',
+  'git init':()=>'Initialized empty Git repository in /mon-projet/.git/',
+  'git status':()=>`On branch main\nChanges not staged for commit:\n  \x1b[33mmodified: index.js\n  modified: style.css\x1b[0m`,
+  'git log --oneline':()=>`\x1b[33ma3f2c1b\x1b[0m feat: add API routes\n\x1b[33m9d8e7f6\x1b[0m init: project setup`,
+  'git add .':()=>'',
+  'git commit -m "save"':()=>'[main a1b2c3d] save\n 2 files changed',
+  'npm install':()=>'added 127 packages in 3.2s\n\x1b[32m✓ Installation terminée\x1b[0m',
+  'npm start':()=>'\x1b[32m✓ Serveur lancé sur http://localhost:3000\x1b[0m',
+  'npm run dev':()=>'\x1b[33m[nodemon] starting node index.js\x1b[0m\n\x1b[32m✓ Serveur lancé sur http://localhost:3000\x1b[0m',
+  'npm test':()=>'\x1b[32mPASS\x1b[0m  tests/app.test.js\n\x1b[32m✓ 5 tests passed\x1b[0m',
+  'pip install flask':()=>'\x1b[32mSuccessfully installed flask-3.0.0\x1b[0m',
+  'python server.py':()=>'\x1b[32mServeur Flask sur http://localhost:5000\x1b[0m',
+  'clear':()=>{document.getElementById('term-output').innerHTML='';return null},
+  'help':()=>`\x1b[34mCommandes disponibles :\x1b[0m\n  ls, pwd, whoami, date, clear, help\n  node -v, npm -v, npm install, npm start, npm run dev, npm test\n  python --version, pip install flask, python server.py\n  git init, git status, git log --oneline, git add ., git commit\n  cat <fichier>, echo <texte>, mkdir <dossier>, rm <fichier>`,
+};
+
+function ansiToHtml(str) {
+  return str
+    .replace(/\x1b\[32m/g,'<span style="color:#4ec9b0">')
+    .replace(/\x1b\[33m/g,'<span style="color:#dcdcaa">')
+    .replace(/\x1b\[34m/g,'<span style="color:#569cd6">')
+    .replace(/\x1b\[31m/g,'<span style="color:#f44747">')
+    .replace(/\x1b\[0m/g,'</span>')
+    .replace(/\n/g,'<br>');
+}
+
+function termPrint(html) {
+  const out = document.getElementById('term-output');
+  const div = document.createElement('div');
+  div.innerHTML = html;
+  out.appendChild(div);
+  out.scrollTop = out.scrollHeight;
+}
+
+function termCmd(cmd) {
+  termPrint(`<span style="color:#4ec9b0">${document.getElementById('term-prompt').textContent}</span> <span style="color:#d4d4d4">${cmd}</span>`);
+  if (!terminalVisible) toggleTerminal();
+  const handler = CMDS[cmd];
+  if (handler) {
+    const r = handler();
+    if (r !== null && r !== undefined) termPrint('<span style="color:#d4d4d4">'+ansiToHtml(r)+'</span>');
+  }
+}
+
+function handleTermKey(e) {
+  if (e.key === 'ArrowUp') {
+    e.preventDefault();
+    if (histIdx < termHistory.length-1) { histIdx++; e.target.value = termHistory[termHistory.length-1-histIdx]; }
+    return;
+  }
+  if (e.key === 'ArrowDown') {
+    e.preventDefault();
+    if (histIdx > 0) { histIdx--; e.target.value = termHistory[termHistory.length-1-histIdx]; }
+    else { histIdx=-1; e.target.value=''; }
+    return;
+  }
+  if (e.key !== 'Enter') return;
+  const raw = e.target.value.trim();
+  e.target.value = '';
+  if (!raw) return;
+  termHistory.push(raw); histIdx = -1;
+  const prompt = document.getElementById('term-prompt').textContent;
+  termPrint(`<span style="color:#4ec9b0">${prompt}</span> <span style="color:#d4d4d4">${raw}</span>`);
+
+  if (raw.startsWith('cat ')) {
+    const f = raw.slice(4).trim();
+    if (FILES[f]) termPrint(`<span style="color:#858585">${FILES[f].content.replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>')}</span>`);
+    else termPrint(`<span style="color:#f44747">cat: ${f}: fichier introuvable</span>`);
+    return;
+  }
+  if (raw.startsWith('echo ')) {
+    termPrint(`<span style="color:#d4d4d4">${raw.slice(5)}</span>`); return;
+  }
+  if (raw.startsWith('mkdir ')) {
+    termPrint(`<span style="color:#4ec9b0">✓ Dossier créé : ${raw.slice(6)}</span>`); return;
+  }
+  if (raw.startsWith('rm ')) {
+    const f = raw.slice(3).trim();
+    termPrint(FILES[f] ? `<span style="color:#4ec9b0">✓ Supprimé : ${f}</span>` : `<span style="color:#f44747">rm: ${f}: introuvable</span>`);
+    return;
+  }
+  if (raw.startsWith('open ')) {
+    const f = raw.slice(5).trim();
+    if (FILES[f]) { openFile(f); termPrint(`<span style="color:#4ec9b0">✓ Ouvert : ${f}</span>`); }
+    else termPrint(`<span style="color:#f44747">Fichier introuvable : ${f}</span>`);
+    return;
+  }
+  const handler = CMDS[raw];
+  if (handler) {
+    const r = handler();
+    if (r !== null && r !== undefined) termPrint('<span style="color:#d4d4d4">'+ansiToHtml(r)+'</span>');
+  } else {
+    termPrint(`<span style="color:#f44747">commande introuvable: ${raw}</span> <span style="color:#858585">— 'help' pour la liste</span>`);
+  }
+}
+
+function switchTermTab(el, type) {
+  document.querySelectorAll('.term-tab-btn').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  currentPanel = type;
+  const out = document.getElementById('term-output');
+  if (type === 'output') {
+    out.innerHTML = '<span style="color:#858585">Aucune sortie récente.</span>';
+  } else if (type === 'problems') {
+    out.innerHTML = '<span style="color:#4ec9b0">✓ 0 erreurs, 0 avertissements.</span>';
+  } else if (type === 'debug') {
+    out.innerHTML = '<span style="color:#858585">Console de débogage — lance npm start pour voir les logs.</span>';
+  } else {
+    out.innerHTML = '';
+    termPrint('<span style="color:#4ec9b0">NathanCode Terminal — tape \'help\' pour la liste des commandes</span>');
+  }
+}
+
+function toggleTerminal() {
+  const panel = document.getElementById('terminal-panel');
+  terminalVisible = !terminalVisible;
+  panel.style.height = terminalVisible ? '200px' : '30px';
+  panel.querySelector('#term-body').style.display = terminalVisible ? 'flex' : 'none';
+}
+
+function clearTerminal() {
+  document.getElementById('term-output').innerHTML = '';
+}
+
+function addTerminal() {
+  termPrint('<span style="color:#569cd6">— Nouveau terminal ouvert —</span>');
+}
+
+// ══════════════════════════════════════════
+//  MISC
+// ══════════════════════════════════════════
+function menuAction(menu) {
+  const actions = {
+    file: 'Fichier → Nouveau, Ouvrir, Sauvegarder (Ctrl+S), Enregistrer tout',
+    edit: 'Édition → Annuler, Rétablir, Couper, Copier, Coller, Rechercher (Ctrl+F)',
+    view: 'Affichage → Explorer, Terminal (Ctrl+`), Minimap, Fil d\'Ariane',
+    terminal: 'Terminal → Nouveau (Ctrl+`), Effacer, Fractionner',
+    help: 'NathanCode v1.0.0 — Éditeur de code moderne\nRaccourcis : Ctrl+S (sauver), Ctrl+F (chercher), Ctrl+/ (commenter)'
+  };
+  if (actions[menu]) {
+    if (!terminalVisible) toggleTerminal();
+    termPrint(`<span style="color:#569cd6">[menu] ${actions[menu]}</span>`);
+  }
+}
+
+function changeTheme(theme) {
+  const themes = {
+    dark:    {bg:'#1e1e1e',bg2:'#252526',text:'#d4d4d4',accent:'#007acc'},
+    monokai: {bg:'#272822',bg2:'#3e3d32',text:'#f8f8f2',accent:'#a6e22e'},
+    light:   {bg:'#ffffff',bg2:'#f3f3f3',text:'#333333',accent:'#005fb8'},
+  };
+  const t = themes[theme] || themes.dark;
+  const root = document.documentElement;
+  root.style.setProperty('--bg',  t.bg);
+  root.style.setProperty('--bg2', t.bg2);
+  root.style.setProperty('--text',t.text);
+  document.getElementById('statusbar').style.background = t.accent;
+  renderEditor(currentFile);
+}
+
+// ══════════════════════════════════════════
+//  INIT
+// ══════════════════════════════════════════
+buildFileTree();
+renderEditor('index.js');
+renderTabs();
+termPrint('<span style="color:#4ec9b0">NathanCode Terminal v1.0.0</span>');
+termPrint('<span style="color:#858585">Tape <span style="color:#d4d4d4">\'help\'</span> pour voir les commandes. Ctrl+S pour sauvegarder.</span>');
+
+// Clock
+setInterval(() => {
+  const now = new Date();
+  document.title = `NathanCode — ${now.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})}`;
+}, 10000);
+</script>
+</body>
+</html>
